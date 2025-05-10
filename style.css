@@ -104,19 +104,3 @@ footer {
     font-size: 1em;
     letter-spacing: 1px;
 }
-.cloud-animation {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 190%;
-    height: 100%;
-    background: url('https://svgshare.com/i/uL7.svg') repeat-x;
-    background-size: contain;
-    animation: moveClouds 60s linear infinite;
-    opacity: 0.2;
-}
-
-@keyframes moveClouds {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
-}
