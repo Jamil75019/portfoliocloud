@@ -1,127 +1,129 @@
-body {
-    margin: 0;
-    font-family: 'Poppins', sans-serif;
-    background: #0a0a0a; /* noir profond */
-    color: #f2f2f2;
-    line-height: 1.6;
-    overflow-x: hidden;
-}
+    body {
+        margin: 0;
+        font-family: 'Poppins', sans-serif;
+        background: #0a0a0a; /* noir profond */
+        color: #f2f2f2;
+        line-height: 1.6;
+        overflow-x: hidden;
+    }
 
-header {
-    background: linear-gradient(135deg, #ff007f, #4c1d95);
-    color: #f2f2f2;
-    padding: 40px 20px;
-    text-align: center;
-    border-bottom: 1px solid #333;
-    position: relative;
-    animation: fadeSlideDown 1s ease-out;
-    overflow: hidden;
-}
+    header {
+        background: url('https://images.unsplash.com/photo-1618022325802-7e5e732d97a1?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Zm9uZCUyMG5vaXJ8ZW58MHx8MHx8fDA%3D') repeat;
+        background-size: contain; 
+        color: #f2f2f2;
+        padding: 50px 20px;
+        text-align: center;
+        border-bottom: 2px solid #333;
+        position: relative;
+        animation: fadeSlideDown 1s ease-out;
+        overflow: hidden;
+    }
+    
 
-@keyframes fadeSlideDown {
-    from { opacity: 0; transform: translateY(-20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
+    @keyframes fadeSlideDown {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
 
-header h1 {
-    margin: 0;
-    font-size: 2.8em;
-    font-weight: 600;
-}
+    header h1 {
+        margin: 0;
+        font-size: 2.8em;
+        font-weight: 600;
+    }
 
-header p {
-    font-size: 1.2em;
-    opacity: 0.9;
-}
+    header p {
+        font-size: 1.2em;
+        opacity: 0.9;
+    }
 
-section {
-    padding: 50px 20px;
-    max-width: 1100px;
-    margin: auto;
-    animation: fadeIn 1s ease-in;
-}
+    section {
+        padding: 50px 20px;
+        max-width: 1100px;
+        margin: auto;
+        animation: fadeIn 1s ease-in;
+    }
 
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
 
-section h2 {
-    font-size: 2em;
-    margin-bottom: 25px;
-    text-align: center;
-    font-weight: 500;
-    color: #ff007f;
-    position: relative;
-}
+    section h2 {
+        font-size: 2em;
+        margin-bottom: 25px;
+        text-align: center;
+        font-weight: 500;
+        color: #ff007f;
+        position: relative;
+    }
 
-section h2::after {
-    content: '';
-    display: block;
-    width: 60px;
-    height: 3px;
-    margin: 10px auto 0;
-    background: #4c1d95;
-    border-radius: 2px;
-}
+    section h2::after {
+        content: '';
+        display: block;
+        width: 60px;
+        height: 3px;
+        margin: 10px auto 0;
+        background: #4c1d95;
+        border-radius: 2px;
+    }
 
-.cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 20px;
-}
+    .cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 20px;
+    }
 
-.card {
-    background: #1a1a1a;
-    padding: 25px;
-    border-radius: 15px;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.6);
-    transition: transform 0.3s, box-shadow 0.3s;
-}
+    .card {
+        background: #1a1a1a;
+        padding: 25px;
+        border-radius: 15px;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.6);
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
 
-.card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 12px 30px rgba(0,0,0,0.8);
-}
+    .card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 30px rgba(0,0,0,0.8);
+    }
 
-.progress {
-    background: #333;
-    border-radius: 30px;
-    overflow: hidden;
-    height: 14px;
-    margin-top: 10px;
-}
+    .progress {
+        background: #333;
+        border-radius: 30px;
+        overflow: hidden;
+        height: 14px;
+        margin-top: 10px;
+    }
 
-.progress-bar {
-    height: 14px;
-    background: linear-gradient(to right, #ff007f, #4c1d95);
-    width: 0;
-    border-radius: 30px;
-    transition: width 1.8s ease-in-out;
-}
+    .progress-bar {
+        height: 14px;
+        background: linear-gradient(to right, #ff007f, #4c1d95);
+        width: 0;
+        border-radius: 30px;
+        transition: width 1.8s ease-in-out;
+    }
 
-footer {
-    text-align: center;
-    padding: 25px;
-    background: #111;
-    color: #f2f2f2;
-    font-size: 0.9em;
-}
+    footer {
+        text-align: center;
+        padding: 25px;
+        background: #111;
+        color: #f2f2f2;
+        font-size: 0.9em;
+    }
 
 
-.cloud-animation {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 300%;
-    height: 100%;
-    background: url('https://svgshare.com/i/12AS.svg') repeat-x; /* prends ici un SVG rose stylé si tu veux */
-    background-size: cover;
-    animation: moveClouds 120s linear infinite;
-    opacity: 0.08;
-}
+    .cloud-animation {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 300%;
+        height: 100%;
+        background: url('https://svgshare.com/i/12AS.svg') repeat-x; 
+        background-size: cover;
+        animation: moveClouds 120s linear infinite;
+        opacity: 0.08;
+    }
 
-@keyframes moveClouds {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-66%); }
-}
+    @keyframes moveClouds {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-66%); }
+    }

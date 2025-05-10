@@ -5,9 +5,4 @@ document.addEventListener('DOMContentLoaded', () => {
             bar.style.width = width + '%';
         }, 300);
     });
-
-    const header = document.querySelector('header');
-    const cloud = document.createElement('div');
-    cloud.classList.add('cloud-animation');
-    header.appendChild(cloud);
 });
