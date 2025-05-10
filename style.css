@@ -1,20 +1,21 @@
 body {
     margin: 0;
     font-family: 'Poppins', sans-serif;
-    background: #0e0e0e;
+    background: #0a0a0a; /* noir profond */
     color: #f2f2f2;
     line-height: 1.6;
     overflow-x: hidden;
 }
 
 header {
-    background: linear-gradient(135deg, #d63384, #4c1d95);
+    background: linear-gradient(135deg, #ff007f, #4c1d95);
     color: #f2f2f2;
     padding: 40px 20px;
     text-align: center;
     border-bottom: 1px solid #333;
     position: relative;
     animation: fadeSlideDown 1s ease-out;
+    overflow: hidden;
 }
 
 @keyframes fadeSlideDown {
@@ -50,7 +51,7 @@ section h2 {
     margin-bottom: 25px;
     text-align: center;
     font-weight: 500;
-    color: #d63384;
+    color: #ff007f;
     position: relative;
 }
 
@@ -93,7 +94,7 @@ section h2::after {
 
 .progress-bar {
     height: 14px;
-    background: linear-gradient(to right, #d63384, #4c1d95);
+    background: linear-gradient(to right, #ff007f, #4c1d95);
     width: 0;
     border-radius: 30px;
     transition: width 1.8s ease-in-out;
@@ -107,19 +108,20 @@ footer {
     font-size: 0.9em;
 }
 
+
 .cloud-animation {
     position: absolute;
     top: 0;
     left: 0;
-    width: 200%;
+    width: 300%;
     height: 100%;
-    background: url('https://svgshare.com/i/uL7.svg') repeat-x;
+    background: url('https://svgshare.com/i/12AS.svg') repeat-x; /* prends ici un SVG rose stylé si tu veux */
     background-size: cover;
-    animation: moveClouds 90s linear infinite;
-    opacity: 0.05;
+    animation: moveClouds 120s linear infinite;
+    opacity: 0.08;
 }
 
 @keyframes moveClouds {
     0% { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
+    100% { transform: translateX(-66%); }
 }
