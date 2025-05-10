@@ -1,17 +1,17 @@
 body {
     margin: 0;
     font-family: 'Poppins', sans-serif;
-    background: linear-gradient(to right, #a1c4fd, #c2e9fb);
+    background: linear-gradient(to right, #f8f9fa, #ffffff);
     color: #333;
     overflow-x: hidden;
 }
 
 header {
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    color: white;
+    background: linear-gradient(135deg, #ffffff, #f1f3f5);
+    color: #111;
     padding: 60px 20px;
     text-align: center;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
     position: relative;
     overflow: hidden;
 }
@@ -23,8 +23,8 @@ header::before {
     left: -50%;
     width: 200%;
     height: 200%;
-    background: radial-gradient(circle at center, rgba(255,255,255,0.1), transparent 70%);
-    animation: rotate 10s linear infinite;
+    background: radial-gradient(circle at center, rgba(0,0,0,0.05), transparent 70%);
+    animation: rotate 20s linear infinite;
 }
 
 @keyframes rotate {
@@ -35,27 +35,45 @@ header::before {
 header h1 {
     margin: 0;
     font-size: 3.5em;
-    letter-spacing: 2px;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    letter-spacing: 1px;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    animation: fadeInDown 1s ease-out;
 }
 
 header p {
     font-size: 1.4em;
     margin-top: 10px;
-    opacity: 0.9;
+    opacity: 0.8;
+    animation: fadeInUp 1s ease-out;
+}
+
+@keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 section {
     padding: 70px 20px;
     max-width: 1200px;
     margin: auto;
+    animation: fadeIn 1s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
 section h2 {
-    font-size: 2.8em;
+    font-size: 2.5em;
     margin-bottom: 40px;
     text-align: center;
-    color: #2b6cb0;
+    color: #111;
 }
 
 .cards {
@@ -65,10 +83,10 @@ section h2 {
 }
 
 .card {
-    background: white;
+    background: #fff;
     padding: 35px;
-    border-radius: 25px;
-    box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+    border-radius: 20px;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.1);
     transition: transform 0.4s, box-shadow 0.4s;
     text-align: center;
     position: relative;
@@ -76,44 +94,45 @@ section h2 {
 }
 
 .card:hover {
-    transform: translateY(-15px) scale(1.05);
-    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    transform: translateY(-10px) scale(1.03);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.15);
 }
 
 .progress {
-    background: #edf2f7;
-    border-radius: 30px;
+    background: #e9ecef;
+    border-radius: 20px;
     overflow: hidden;
-    height: 20px;
-    margin-top: 20px;
+    height: 16px;
+    margin-top: 15px;
     box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
 }
 
 .progress-bar {
-    height: 20px;
-    background: linear-gradient(to right, #667eea, #764ba2);
+    height: 16px;
+    background: linear-gradient(to right, #111, #444);
     width: 0;
     transition: width 2s ease-in-out;
 }
 
 footer {
     text-align: center;
-    padding: 40px;
-    background: #2d3748;
-    color: #edf2f7;
+    padding: 30px;
+    background: #111;
+    color: #f8f9fa;
     font-size: 1em;
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
 }
+
 .cloud-animation {
     position: absolute;
     top: 0;
     left: 0;
-    width: 190%;
+    width: 200%;
     height: 100%;
     background: url('https://svgshare.com/i/uL7.svg') repeat-x;
     background-size: contain;
-    animation: moveClouds 60s linear infinite;
-    opacity: 0.2;
+    animation: moveClouds 90s linear infinite;
+    opacity: 0.1;
 }
 
 @keyframes moveClouds {
