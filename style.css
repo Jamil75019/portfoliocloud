@@ -1,18 +1,18 @@
 body {
     margin: 0;
     font-family: 'Poppins', sans-serif;
-    background: #f9f9f9;
-    color: #333;
+    background: #0e0e0e;
+    color: #f2f2f2;
     line-height: 1.6;
     overflow-x: hidden;
 }
 
 header {
-    background: #ffffff;
-    color: #111;
+    background: linear-gradient(135deg, #d63384, #4c1d95);
+    color: #f2f2f2;
     padding: 40px 20px;
     text-align: center;
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: 1px solid #333;
     position: relative;
     animation: fadeSlideDown 1s ease-out;
 }
@@ -30,7 +30,7 @@ header h1 {
 
 header p {
     font-size: 1.2em;
-    opacity: 0.8;
+    opacity: 0.9;
 }
 
 section {
@@ -50,7 +50,7 @@ section h2 {
     margin-bottom: 25px;
     text-align: center;
     font-weight: 500;
-    color: #222;
+    color: #d63384;
     position: relative;
 }
 
@@ -60,7 +60,7 @@ section h2::after {
     width: 60px;
     height: 3px;
     margin: 10px auto 0;
-    background: #111;
+    background: #4c1d95;
     border-radius: 2px;
 }
 
@@ -71,20 +71,20 @@ section h2::after {
 }
 
 .card {
-    background: #fff;
+    background: #1a1a1a;
     padding: 25px;
     border-radius: 15px;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.6);
     transition: transform 0.3s, box-shadow 0.3s;
 }
 
 .card:hover {
     transform: translateY(-8px);
-    box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.8);
 }
 
 .progress {
-    background: #e0e0e0;
+    background: #333;
     border-radius: 30px;
     overflow: hidden;
     height: 14px;
@@ -93,7 +93,7 @@ section h2::after {
 
 .progress-bar {
     height: 14px;
-    background: linear-gradient(to right, #111, #333);
+    background: linear-gradient(to right, #d63384, #4c1d95);
     width: 0;
     border-radius: 30px;
     transition: width 1.8s ease-in-out;
@@ -103,7 +103,7 @@ footer {
     text-align: center;
     padding: 25px;
     background: #111;
-    color: #f1f1f1;
+    color: #f2f2f2;
     font-size: 0.9em;
 }
 
