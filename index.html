@@ -51,18 +51,54 @@
 
 <section>
     <h2>Projets</h2>
-    <div class="cards">
-        <div class="card">
-            <h3>Jeu en JavaScript</h3>
-            <p>Création d'un jeu interactif en JS pour s'initier au développement web.</p>
+    
+    <div class="tabs-container">
+        <div class="tabs">
+            <button class="tab-btn active" data-category="cloud">CLOUD</button>
+            <button class="tab-btn" data-category="cyber">CYBER</button>
+            <button class="tab-btn" data-category="reseaux">RESEAUX</button>
         </div>
-        <div class="card">
-            <h3>Site e-commerce</h3>
-            <p>Développement d'un site marchand avec HTML/CSS/JS et intégration PHP/SQL.</p>
+        
+        <div class="tab-content active" id="cloud-content">
+            <h3 class="category-title">☁️ Cloud / DevOps / Automatisation</h3>
+            <div class="cards">
+                <div class="card">
+                    <h3>Scraping RH LinkedIn ciblé</h3>
+                    <p>Recherches "RH France [Entreprise]", extraction nom/prénom/poste/email. Export structuré .txt, utilisé pour candidatures.</p>
+                </div>
+                <div class="card">
+                    <h3>CI/CD FreshDNS (GitHub ↔ VM Debian)</h3>
+                    <p>Dépôt Git synchronisé avec développement local via VSCode. Scraping automatique lancé dans la VM via cron + pipeline de déploiement manuel.</p>
+                </div>
+            </div>
         </div>
-        <div class="card">
-            <h3>Réseau pour petite structure</h3>
-            <p>Conception et administration d'un réseau informatique pour une PME.</p>
+        
+        <div class="tab-content" id="cyber-content">
+            <h3 class="category-title">🔐 Cybersécurité</h3>
+            <div class="cards">
+                <div class="card">
+                    <h3>Chat Sécurisé (Java + TLS + MySQL)</h3>
+                    <p>Serveur/client Java avec Swing, échanges chiffrés en SSL/TLS, stockage des messages dans une base MySQL.</p>
+                </div>
+                <div class="card">
+                    <h3>Détection de phishing via domaines expirés</h3>
+                    <p>Scraping automatique de domaines expirés, comparaison avec des marques connues via RapidFuzz, résultats affichés dans un site web.</p>
+                </div>
+                <div class="card">
+                    <h3>Projet Sécurité Web</h3>
+                    <p>Création d'un site sécurisé avec hash des mots de passe, captcha, blocage après X tentatives. Pentest avec Hydra pour tester la robustesse.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="reseaux-content">
+            <h3 class="category-title">🌐 Réseaux</h3>
+            <div class="cards">
+                <div class="card">
+                    <h3>Infrastructure bancaire multi-sites</h3>
+                    <p>Architecture opérateur (AS 25180) et client (AS 65010). Technologies : OSPF backbone, eBGP PE-CE / iBGP PE-PE, MPLS + VRF, OpenVPN pour accès nomades.</p>
+                </div>
+            </div>
         </div>
     </div>
 </section>
