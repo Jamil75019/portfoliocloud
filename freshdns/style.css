@@ -121,23 +121,45 @@ footer {
 
 .portfolio-btn {
     display: inline-block;
-    background: #1b1b1f;
+    background: linear-gradient(135deg, #1b1b1f 0%, #2a2a33 100%);
     color: #fff;
-    padding: 10px 25px;
+    padding: 12px 30px;
     margin-top: 20px;
-    border-radius: 8px;
+    border-radius: 50px;
     text-decoration: none;
     font-weight: 600;
-    border: 2px solid #ff007f;
+    letter-spacing: 0.5px;
+    border: none;
+    box-shadow: 0 5px 15px rgba(255,0,127,0.2);
     transition: all 0.3s ease;
     position: relative;
     z-index: 1;
+    text-transform: uppercase;
+    font-size: 0.9em;
+}
+
+.portfolio-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #ff007f 0%, #d6006e 100%);
+    border-radius: 50px;
+    z-index: -1;
+    transition: opacity 0.3s ease;
+    opacity: 0;
 }
 
 .portfolio-btn:hover {
-    background: #ff007f;
     transform: translateY(-3px);
-    box-shadow: 0 6px 15px rgba(255,0,127,0.3);
+    box-shadow: 0 8px 20px rgba(255,0,127,0.4);
+    color: #fff;
+}
+
+.portfolio-btn:hover::before {
+    opacity: 1;
 }
 
 @keyframes moveClouds {

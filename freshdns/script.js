@@ -35,6 +35,11 @@ function renderPage(page) {
 document.addEventListener("DOMContentLoaded", () => {
     loadDomains();
 
+    document.getElementById("first").addEventListener("click", () => {
+        currentPage = 1;
+        renderPage(currentPage);
+    });
+
     document.getElementById("prev").addEventListener("click", () => {
         if (currentPage > 1) {
             currentPage--;
