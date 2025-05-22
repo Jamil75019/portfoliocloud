@@ -1,0 +1,3 @@
+Pour lancer les programmes :
+/home/admin/scraper_dns/venv/bin/python /home/admin/scraper_dns/scrapdns.py
+/home/admin/scraper_dns/venv/bin/python /home/admin/scraper_dns/score.py

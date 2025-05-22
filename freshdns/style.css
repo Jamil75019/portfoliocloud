@@ -120,22 +120,28 @@ footer {
 }
 
 .portfolio-btn {
-    display: inline-block;
-    background: linear-gradient(135deg, #1b1b1f 0%, #2a2a33 100%);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: rgba(0, 0, 0, 0.2);
     color: #fff;
-    padding: 12px 30px;
-    margin-top: 20px;
-    border-radius: 50px;
+    padding: 14px 32px;
+    margin-top: 25px;
+    border-radius: 12px;
     text-decoration: none;
     font-weight: 600;
     letter-spacing: 0.5px;
-    border: none;
-    box-shadow: 0 5px 15px rgba(255,0,127,0.2);
-    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3), 
+                inset 0 1px 1px rgba(255, 255, 255, 0.2),
+                0 0 20px rgba(255, 0, 127, 0.4);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     position: relative;
     z-index: 1;
-    text-transform: uppercase;
-    font-size: 0.9em;
+    overflow: hidden;
+    font-size: 1rem;
 }
 
 .portfolio-btn::before {
@@ -145,21 +151,34 @@ footer {
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, #ff007f 0%, #d6006e 100%);
-    border-radius: 50px;
+    background: linear-gradient(45deg, #ff007f, #6e00ff);
     z-index: -1;
-    transition: opacity 0.3s ease;
-    opacity: 0;
+    transition: transform 0.6s cubic-bezier(0.19, 1, 0.22, 1);
+    transform: scaleX(0);
+    transform-origin: right;
 }
 
 .portfolio-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(255,0,127,0.4);
+    transform: translateY(-5px) scale(1.03);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4),
+                0 0 30px rgba(255, 0, 127, 0.6);
     color: #fff;
+    text-shadow: 0 1px 5px rgba(0, 0, 0, 0.3);
+    border-color: rgba(255, 255, 255, 0.3);
 }
 
 .portfolio-btn:hover::before {
-    opacity: 1;
+    transform: scaleX(1);
+    transform-origin: left;
+}
+
+.portfolio-btn i {
+    font-size: 1.1rem;
+    transition: transform 0.3s ease;
+}
+
+.portfolio-btn:hover i {
+    transform: translateX(-3px);
 }
 
 @keyframes moveClouds {
