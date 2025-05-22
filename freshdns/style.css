@@ -118,10 +118,33 @@ footer {
     pointer-events: none;
     z-index: 0;
 }
+
+.portfolio-btn {
+    display: inline-block;
+    background: #1b1b1f;
+    color: #fff;
+    padding: 10px 25px;
+    margin-top: 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    border: 2px solid #ff007f;
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 1;
+}
+
+.portfolio-btn:hover {
+    background: #ff007f;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(255,0,127,0.3);
+}
+
 @keyframes moveClouds {
     0% { transform: translateX(0); }
     100% { transform: translateX(-66%); }
 }
+
 .pagination {
     text-align: center;
     margin-top: 30px;
