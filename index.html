@@ -5,117 +5,327 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portfolio Jamil</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;700&family=Montserrat:wght@400;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="dark-theme">
+    <div id="particles-js"></div>
+    <div class="cursor"></div>
+    <div class="cursor-follower"></div>
+
+    <nav class="floating-nav">
+        <ul>
+            <li><a href="#about" class="nav-link"><i class="fas fa-user"></i><span>À propos</span></a></li>
+            <li><a href="#exp" class="nav-link"><i class="fas fa-briefcase"></i><span>Expériences</span></a></li>
+            <li><a href="#skills" class="nav-link"><i class="fas fa-code"></i><span>Compétences</span></a></li>
+            <li><a href="#projects" class="nav-link"><i class="fas fa-project-diagram"></i><span>Projets</span></a></li>
+            <li><a href="#contact" class="nav-link"><i class="fas fa-envelope"></i><span>Contact</span></a></li>
+        </ul>
+    </nav>
+
     <header>
+        <div class="theme-toggle">
+            <i class="fas fa-moon"></i>
+            <i class="fas fa-sun"></i>
+        </div>
         <a href="/freshdns/" class="btn-freshdns" target="_blank">🔍 Accéder à FreshDNS</a>
-        <h1>Jamil Medjek</h1>
-        <p>Étudiant en Réseaux et Télécommunications</p>
+        <h1 class="glitch-text" data-text="Jamil Medjek">Jamil Medjek</h1>
+        <p data-aos="fade-up" data-aos-delay="200">Étudiant en Réseaux et Télécommunications</p>
+        <div class="scroll-indicator">
+            <span>Défiler</span>
+            <i class="fas fa-chevron-down"></i>
+        </div>
     </header>
 
-```
-<section>
-    <h2>À propos de moi</h2>
-    <p>Je suis Medjek Jamil, étudiant en BUT Réseaux et Télécommunications à l'IUT de Vitry - UPEC, passionné par l'informatique, la vidéo, et le football. Je cherche à faire ma 2ᵉ et 3ᵉ année en alternance.</p>
-</section>
-
-<section>
-    <h2>Expériences</h2>
-    <div class="cards">
-        <div class="card">
-            <h3>Marchand (2022)</h3>
-            <p>Vente de produits alimentaires, gestion de clients nombreux, satisfaction client.</p>
-        </div>
-        <div class="card">
-            <h3>Animateur (2023)</h3>
-            <p>Encadrement de 20 enfants, animation d'activités ludiques et éducatives, sécurité.</p>
-        </div>
-        <div class="card">
-            <h3>Stage Optique (2020)</h3>
-            <p>Assistance en optique, sensibilisation des clients, mise en place de mesures.</p>
-        </div>
-    </div>
-</section>
-
-<section>
-    <h2>Compétences</h2>
-    <div>
-        <p>Python</p><div class="progress"><div class="progress-bar" data-width="80"></div></div>
-        <p>HTML / CSS / JS</p><div class="progress"><div class="progress-bar" data-width="90"></div></div>
-        <p>Réseau / Cisco / CCNA</p><div class="progress"><div class="progress-bar" data-width="75"></div></div>
-        <p>SQL / PHP</p><div class="progress"><div class="progress-bar" data-width="70"></div></div>
-    </div>
-</section>
-
-<section>
-    <h2>Projets</h2>
-    
-    <div class="tabs-container">
-        <div class="tabs">
-            <button class="tab-btn active" data-category="cloud">CLOUD</button>
-            <button class="tab-btn" data-category="cyber">CYBER</button>
-            <button class="tab-btn" data-category="reseaux">RESEAUX</button>
-        </div>
-        
-        <div class="tab-content active" id="cloud-content">
-            <h3 class="category-title">☁️ Cloud / DevOps / Automatisation</h3>
-            <div class="cards">
-                <div class="card">
-                    <h3>Scraping RH LinkedIn ciblé</h3>
-                    <p>Recherches "RH France [Entreprise]", extraction nom/prénom/poste/email. Export structuré .txt, utilisé pour candidatures.</p>
-                </div>
-                <div class="card">
-                    <h3>CI/CD FreshDNS (GitHub ↔ VM Debian)</h3>
-                    <p>Dépôt Git synchronisé avec développement local via VSCode. Scraping automatique lancé dans la VM via cron + pipeline de déploiement manuel.</p>
+    <section id="about" data-aos="fade-up">
+        <h2>À propos de moi</h2>
+        <div class="about-content">
+            <div class="about-text">
+                <p>Je suis Medjek Jamil, étudiant en BUT Réseaux et Télécommunications à l'IUT de Vitry - UPEC, passionné par l'informatique, la vidéo, et le football. Je cherche à faire ma 2ᵉ et 3ᵉ année en alternance.</p>
+                <div class="tech-stack">
+                    <span class="tech-badge">Python</span>
+                    <span class="tech-badge">JavaScript</span>
+                    <span class="tech-badge">Réseau</span>
+                    <span class="tech-badge">DevOps</span>
+                    <span class="tech-badge">Cybersécurité</span>
                 </div>
             </div>
         </div>
-        
-        <div class="tab-content" id="cyber-content">
-            <h3 class="category-title">🔐 Cybersécurité</h3>
-            <div class="cards">
+    </section>
+
+    <section id="exp" data-aos="fade-up">
+        <h2>Expériences</h2>
+        <div class="timeline">
+            <div class="timeline-item" data-aos="fade-right">
+                <div class="timeline-date">2023</div>
                 <div class="card">
-                    <h3>Chat Sécurisé (Java + TLS + MySQL)</h3>
-                    <p>Serveur/client Java avec Swing, échanges chiffrés en SSL/TLS, stockage des messages dans une base MySQL.</p>
+                    <h3>Animateur</h3>
+                    <p>Encadrement de 20 enfants, animation d'activités ludiques et éducatives, sécurité.</p>
                 </div>
+            </div>
+            <div class="timeline-item" data-aos="fade-left">
+                <div class="timeline-date">2022</div>
                 <div class="card">
-                    <h3>Détection de phishing via domaines expirés</h3>
-                    <p>Scraping automatique de domaines expirés, comparaison avec des marques connues via RapidFuzz, résultats affichés dans un site web.</p>
+                    <h3>Marchand</h3>
+                    <p>Vente de produits alimentaires, gestion de clients nombreux, satisfaction client.</p>
                 </div>
+            </div>
+            <div class="timeline-item" data-aos="fade-right">
+                <div class="timeline-date">2020</div>
                 <div class="card">
-                    <h3>Projet Sécurité Web</h3>
-                    <p>Création d'un site sécurisé avec hash des mots de passe, captcha, blocage après X tentatives. Pentest avec Hydra pour tester la robustesse.</p>
+                    <h3>Stage Optique</h3>
+                    <p>Assistance en optique, sensibilisation des clients, mise en place de mesures.</p>
                 </div>
             </div>
         </div>
-        
-        <div class="tab-content" id="reseaux-content">
-            <h3 class="category-title">🌐 Réseaux</h3>
-            <div class="cards">
-                <div class="card">
-                    <h3>Infrastructure bancaire multi-sites</h3>
-                    <p>Architecture opérateur (AS 25180) et client (AS 65010). Technologies : OSPF backbone, eBGP PE-CE / iBGP PE-PE, MPLS + VRF, OpenVPN pour accès nomades.</p>
+    </section>
+
+    <section id="skills" data-aos="fade-up">
+        <h2>Compétences</h2>
+        <div class="skills-container">
+            <div class="skills-grid">
+                <div class="skill-category" data-aos="fade-right">
+                    <h3 class="category-title">🔐 Cybersécurité</h3>
+                    <ul class="skill-list">
+                        <li>Analyse de vulnérabilités (Hydra, injections SQL)</li>
+                        <li>Sécurisation web (hash, captcha, anti-brute force)</li>
+                        <li>TLS/SSL, chiffrement des communications</li>
+                        <li>Détection de phishing (RapidFuzz, scraping ciblé)</li>
+                    </ul>
+                </div>
+                
+                <div class="skill-category" data-aos="fade-up">
+                    <h3 class="category-title">🌐 Réseaux</h3>
+                    <ul class="skill-list">
+                        <li>Protocoles : OSPF, BGP (iBGP / eBGP), VRRP</li>
+                        <li>MPLS, VRF, VLANs & ACLs</li>
+                        <li>Simulation GNS3 multi-sites (banque, client VPN nomade)</li>
+                        <li>VPN (OpenVPN), adressage IP avancé</li>
+                    </ul>
+                </div>
+                
+                <div class="skill-category" data-aos="fade-left">
+                    <h3 class="category-title">☁️ Cloud & DevOps</h3>
+                    <ul class="skill-list">
+                        <li>Linux (Debian), bash scripting, cron</li>
+                        <li>Docker (conteneurs Apache), CI/CD GitHub ↔ VM</li>
+                    </ul>
+                </div>
+                
+                <div class="skill-category" data-aos="fade-right">
+                    <h3 class="category-title"><i class="fab fa-python"></i> Python</h3>
+                    <ul class="skill-list">
+                        <li>Web scraping (Selenium, BeautifulSoup, Playwright)</li>
+                    </ul>
+                </div>
+                
+                <div class="skill-category" data-aos="fade-up">
+                    <h3 class="category-title"><i class="fas fa-code"></i> Développement Web</h3>
+                    <ul class="skill-list">
+                        <li>HTML/CSS, PHP, JavaScript</li>
+                        <li>Git / GitHub, Visual Studio Code</li>
+                    </ul>
                 </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<section>
-    <h2>Contact</h2>
-    <p>Email : jamilmdk.pro@gmail.com</p>
-    <p>Téléphone : 06 10 13 58 95</p>
-    <p>Localisation : Paris, Île-de-France</p>
-</section>
+    <section id="projects" data-aos="fade-up">
+        <h2>Projets</h2>
+        
+        <div class="tabs-container">
+            <div class="tabs">
+                <button class="tab-btn active" data-category="cloud">CLOUD</button>
+                <button class="tab-btn" data-category="cyber">CYBER</button>
+                <button class="tab-btn" data-category="reseaux">RESEAUX</button>
+            </div>
+            
+            <div class="tab-content active" id="cloud-content">
+                <h3 class="category-title">☁️ Cloud / DevOps / Automatisation</h3>
+                <div class="cards">
+                    <div class="card project-card" data-aos="flip-left">
+                        <div class="project-image" style="background-image: url('https://images.unsplash.com/photo-1607799279861-4dd421887fb3?ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80')">
+                            <div class="project-overlay">
+                                <i class="fab fa-linkedin"></i>
+                            </div>
+                        </div>
+                        <div class="project-content">
+                            <h3>Scraping RH LinkedIn ciblé</h3>
+                            <p>Recherches "RH France [Entreprise]", extraction nom/prénom/poste/email. Export structuré .txt, utilisé pour candidatures.</p>
+                            <div class="project-tech">
+                                <span>Python</span>
+                                <span>Selenium</span>
+                                <span>BeautifulSoup</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card project-card" data-aos="flip-right">
+                        <div class="project-image" style="background-image: url('https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80')">
+                            <div class="project-overlay">
+                                <i class="fab fa-github"></i>
+                            </div>
+                        </div>
+                        <div class="project-content">
+                            <h3>CI/CD FreshDNS (GitHub ↔ VM Debian)</h3>
+                            <p>Dépôt Git synchronisé avec développement local via VSCode. Scraping automatique lancé dans la VM via cron + pipeline de déploiement manuel.</p>
+                            <div class="project-tech">
+                                <span>GitHub</span>
+                                <span>Debian</span>
+                                <span>Cron</span>
+                                <span>VSCode</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="cyber-content">
+                <h3 class="category-title">🔐 Cybersécurité</h3>
+                <div class="cards">
+                    <div class="card project-card" data-aos="flip-up">
+                        <div class="project-image" style="background-image: url('https://images.unsplash.com/photo-1593642532744-d377ab507dc8?ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80')">
+                            <div class="project-overlay">
+                                <i class="fas fa-lock"></i>
+                            </div>
+                        </div>
+                        <div class="project-content">
+                            <h3>Chat Sécurisé (Java + TLS + MySQL)</h3>
+                            <p>Serveur/client Java avec Swing, échanges chiffrés en SSL/TLS, stockage des messages dans une base MySQL.</p>
+                            <div class="project-tech">
+                                <span>Java</span>
+                                <span>Swing</span>
+                                <span>SSL/TLS</span>
+                                <span>MySQL</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card project-card" data-aos="flip-down">
+                        <div class="project-image" style="background-image: url('https://images.unsplash.com/photo-1544890225-2f3faec4cd60?ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80')">
+                            <div class="project-overlay">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                        </div>
+                        <div class="project-content">
+                            <h3>Détection de phishing via domaines expirés</h3>
+                            <p>Scraping automatique de domaines expirés, comparaison avec des marques connues via RapidFuzz, résultats affichés dans un site web.</p>
+                            <div class="project-tech">
+                                <span>Python</span>
+                                <span>RapidFuzz</span>
+                                <span>JavaScript</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card project-card" data-aos="flip-left">
+                        <div class="project-image" style="background-image: url('https://images.unsplash.com/photo-1510511459019-5dda7724fd87?ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80')">
+                            <div class="project-overlay">
+                                <i class="fas fa-user-shield"></i>
+                            </div>
+                        </div>
+                        <div class="project-content">
+                            <h3>Projet Sécurité Web</h3>
+                            <p>Création d'un site sécurisé avec hash des mots de passe, captcha, blocage après X tentatives. Pentest avec Hydra pour tester la robustesse.</p>
+                            <div class="project-tech">
+                                <span>PHP</span>
+                                <span>MySQL</span>
+                                <span>Hydra</span>
+                                <span>Captcha</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="reseaux-content">
+                <h3 class="category-title">🌐 Réseaux</h3>
+                <div class="cards">
+                    <div class="card project-card" data-aos="flip-right">
+                        <div class="project-image" style="background-image: url('https://images.unsplash.com/photo-1558494949-ef010cbdcc31?ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80')">
+                            <div class="project-overlay">
+                                <i class="fas fa-network-wired"></i>
+                            </div>
+                        </div>
+                        <div class="project-content">
+                            <h3>Infrastructure bancaire multi-sites</h3>
+                            <p>Architecture opérateur (AS 25180) et client (AS 65010). Technologies : OSPF backbone, eBGP PE-CE / iBGP PE-PE, MPLS + VRF, OpenVPN pour accès nomades.</p>
+                            <div class="project-tech">
+                                <span>OSPF</span>
+                                <span>BGP</span>
+                                <span>MPLS</span>
+                                <span>VRF</span>
+                                <span>OpenVPN</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-<footer>
-    &copy; 2025 Jamil Medjek
-</footer>
+    <section id="contact" data-aos="fade-up">
+        <h2>Contact</h2>
+        <div class="contact-container">
+            <div class="contact-form">
+                <h3>Envoyez-moi un message</h3>
+                <form id="contact-form">
+                    <div class="form-group">
+                        <input type="text" id="name" placeholder="Votre nom" required>
+                        <label for="name">Nom</label>
+                    </div>
+                    <div class="form-group">
+                        <input type="email" id="email" placeholder="Votre email" required>
+                        <label for="email">Email</label>
+                    </div>
+                    <div class="form-group">
+                        <textarea id="message" placeholder="Votre message" required></textarea>
+                        <label for="message">Message</label>
+                    </div>
+                    <button type="submit" class="btn-submit">
+                        <span>Envoyer</span>
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </form>
+            </div>
+            <div class="contact-info">
+                <div class="contact-card">
+                    <i class="fas fa-envelope"></i>
+                    <h3>Email</h3>
+                    <p>jamilmdk.pro@gmail.com</p>
+                </div>
+                <div class="contact-card">
+                    <i class="fas fa-phone"></i>
+                    <h3>Téléphone</h3>
+                    <p>06 10 13 58 95</p>
+                </div>
+                <div class="contact-card">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <h3>Localisation</h3>
+                    <p>Paris, Île-de-France</p>
+                </div>
+                <div class="social-links">
+                    <a href="#" class="social-link"><i class="fab fa-linkedin"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-github"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                </div>
+            </div>
+        </div>
+    </section>
 
-<script src="script.js"></script>
-```
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">JM</div>
+            <p>&copy; 2025 Jamil Medjek</p>
+            <div class="footer-links">
+                <a href="#about">À propos</a>
+                <a href="#projects">Projets</a>
+                <a href="#contact">Contact</a>
+            </div>
+        </div>
+    </footer>
 
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
