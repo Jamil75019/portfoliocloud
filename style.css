@@ -128,3 +128,24 @@
         0% { transform: translateX(0); }
         100% { transform: translateX(-66%); }
     }
+	.btn-freshdns {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: linear-gradient(to right, #ff007f, #4c1d95);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1em;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    transition: transform 0.2s ease, background 0.3s ease;
+    z-index: 10;
+}
+
+.btn-freshdns:hover {
+    transform: scale(1.05);
+    background: linear-gradient(to right, #4c1d95, #ff007f);
+}
+
