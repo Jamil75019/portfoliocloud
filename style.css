@@ -24,7 +24,7 @@ html {
 
 body {
     margin: 0;
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     background: var(--dark);
     color: var(--text);
     line-height: 1.6;
@@ -157,7 +157,7 @@ body.light-theme .fa-sun {
 
 /* Header */
 header {
-    background: url('https://images.unsplash.com/photo-1618022325802-7e5e732d97a1?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Zm9uZCUyMG5vaXJ8ZW58MHx8MHx8fDA%3D') repeat;
+    background: var(--dark);
     background-size: cover; 
     background-position: center;
     color: var(--text);
