@@ -20,4 +20,8 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             cd /var/www/html
-            git pull origin main
+            git config --global --add safe.directory /var/www/html
+            sudo chown -R www-data:www-data .
+            sudo -u www-data git fetch origin main
+            sudo -u www-data git reset --hard origin/main
+            sudo systemctl restart apache2
