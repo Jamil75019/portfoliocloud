@@ -1,9 +1,6 @@
 <?php
-// Force un log dans le fichier error_log d'Apache
-error_log("Le script send_mail.php a été appelé!", 0);
-
-// Activer l'affichage des erreurs
-ini_set('display_errors', 1);
+// Désactiver l'affichage des erreurs dans la sortie
+ini_set('display_errors', 0);
 error_reporting(E_ALL);
 
 // Configuration des headers
@@ -27,9 +24,10 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 // Log the raw input
-logError("Raw input: " . file_get_contents('php://input'));
+$raw_input = file_get_contents('php://input');
+logError("Raw input: " . $raw_input);
 
-$data = json_decode(file_get_contents('php://input'), true);
+$data = json_decode($raw_input, true);
 logError("Données décodées: " . print_r($data, true));
 
 if (!isset($data['name']) || !isset($data['email']) || !isset($data['message'])) {
@@ -65,7 +63,7 @@ $email_content .= "Email: " . $email . "\n\n";
 $email_content .= "Message:\n" . $message;
 
 logError("Tentative d'envoi d'email à $to");
-logError("Headers: " . print_r($headers, true));
+logError("Headers: " . $headers);
 logError("Contenu: " . $email_content);
 
 $mail_result = mail($to, $subject, $email_content, $headers);
