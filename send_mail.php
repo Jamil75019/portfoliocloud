@@ -17,6 +17,7 @@ function logError($message) {
 logError("Début du traitement de la requête");
 logError("Méthode: " . $_SERVER['REQUEST_METHOD']);
 logError("Content-Type: " . $_SERVER['CONTENT_TYPE']);
+logError("User Agent: " . $_SERVER['HTTP_USER_AGENT']);
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     logError("Méthode non autorisée: " . $_SERVER['REQUEST_METHOD']);
@@ -30,6 +31,7 @@ $email = $_POST['email'] ?? '';
 $message = $_POST['message'] ?? '';
 
 logError("Données reçues - Nom: $name, Email: $email");
+logError("Message reçu: $message");
 
 if (empty($name) || empty($email) || empty($message)) {
     logError("Champs manquants dans la requête");
@@ -51,24 +53,49 @@ if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
 
 $to = "jamilmdk.pro@gmail.com";
 $subject = "Nouveau message de contact - Portfolio";
-$headers = "From: $email\r\n";
-$headers .= "Reply-To: $email\r\n";
-$headers .= "X-Mailer: PHP/" . phpversion() . "\r\n";
-$headers .= "MIME-Version: 1.0\r\n";
-$headers .= "Content-Type: text/plain; charset=UTF-8\r\n";
 
-$email_content = "Nom: " . $name . "\n";
-$email_content .= "Email: " . $email . "\n\n";
-$email_content .= "Message:\n" . $message;
+// Construction des en-têtes
+$headers = array(
+    'From' => $email,
+    'Reply-To' => $email,
+    'X-Mailer' => 'PHP/' . phpversion(),
+    'MIME-Version' => '1.0',
+    'Content-Type' => 'text/plain; charset=UTF-8'
+);
+
+$email_content = "Nouveau message de contact reçu :\n\n";
+$email_content .= "Nom : " . $name . "\n";
+$email_content .= "Email : " . $email . "\n\n";
+$email_content .= "Message :\n" . $message . "\n\n";
+$email_content .= "---\n";
+$email_content .= "Envoyé depuis le formulaire de contact du portfolio\n";
+$email_content .= "Date : " . date('Y-m-d H:i:s') . "\n";
+$email_content .= "IP : " . $_SERVER['REMOTE_ADDR'] . "\n";
 
 logError("Tentative d'envoi d'email à $to");
-logError("Headers: " . $headers);
+logError("Headers: " . print_r($headers, true));
 logError("Contenu: " . $email_content);
 
-$mail_result = mail($to, $subject, $email_content, $headers);
-logError("Résultat de l'envoi: " . ($mail_result ? "Succès" : "Échec"));
+// Tentative d'envoi avec mail()
+$mail_result = mail($to, $subject, $email_content, implode("\r\n", array_map(
+    function ($v, $k) { return "$k: $v"; },
+    $headers,
+    array_keys($headers)
+)));
+
+logError("Résultat de l'envoi avec mail(): " . ($mail_result ? "Succès" : "Échec"));
 
 if ($mail_result) {
+    // Tentative d'envoi avec un autre serveur SMTP si disponible
+    if (function_exists('mb_send_mail')) {
+        $mb_result = mb_send_mail($to, $subject, $email_content, implode("\r\n", array_map(
+            function ($v, $k) { return "$k: $v"; },
+            $headers,
+            array_keys($headers)
+        )));
+        logError("Résultat de l'envoi avec mb_send_mail(): " . ($mb_result ? "Succès" : "Échec"));
+    }
+    
     header('Location: /?success=1');
 } else {
     logError("Erreur lors de l'envoi de l'email - Erreur PHP: " . error_get_last()['message']);
