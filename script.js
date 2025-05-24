@@ -199,7 +199,8 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('Données du formulaire:', formData); // Debug log
             
             try {
-                const response = await fetch('send_mail.php', { // Removed the leading slash
+                console.log('Envoi de la requête à send_mail.php'); // Debug log
+                const response = await fetch('send_mail.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
