@@ -1,11 +1,27 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // Vérifier si on revient après un envoi réussi
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('success') === '1') {
+        const submitBtn = document.querySelector('.btn-submit');
+        if (submitBtn) {
+            submitBtn.innerHTML = '<span>Envoyé !</span> <i class="fas fa-check"></i>';
+            setTimeout(() => {
+                submitBtn.innerHTML = '<span>Envoyer</span> <i class="fas fa-paper-plane"></i>';
+            }, 2000);
+        }
+    }
+
     // Initialiser AOS (Animate On Scroll)
-    AOS.init({
-        duration: 800,
-        easing: 'ease',
-        once: true,
-        offset: 100
-    });
+    try {
+        AOS.init({
+            duration: 800,
+            easing: 'ease',
+            once: true,
+            offset: 100
+        });
+    } catch (error) {
+        console.error('Erreur lors de l\'initialisation de AOS:', error);
+    }
     
     // Animation des barres de progression
     const progressBars = document.querySelectorAll('.progress-bar');
