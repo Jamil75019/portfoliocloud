@@ -175,9 +175,12 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Gestion du formulaire de contact
     const contactForm = document.getElementById('contact-form');
+    console.log('Formulaire trouvé:', contactForm); // Debug log
+
     if (contactForm) {
         contactForm.addEventListener('submit', async function(e) {
             e.preventDefault();
+            console.log('Formulaire soumis'); // Debug log
             
             // Animation de soumission
             const submitBtn = this.querySelector('.btn-submit');
@@ -193,8 +196,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 message: document.getElementById('message').value
             };
             
+            console.log('Données du formulaire:', formData); // Debug log
+            
             try {
-                const response = await fetch('/send_mail.php', {
+                const response = await fetch('send_mail.php', { // Removed the leading slash
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -202,7 +207,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     body: JSON.stringify(formData)
                 });
                 
+                console.log('Réponse reçue:', response); // Debug log
+                
                 const result = await response.json();
+                console.log('Résultat:', result); // Debug log
                 
                 if (result.success) {
                     submitBtn.innerHTML = '<span>Envoyé !</span> <i class="fas fa-check"></i>';
@@ -216,8 +224,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     throw new Error(result.error || 'Erreur lors de l\'envoi');
                 }
             } catch (error) {
+                console.error('Erreur lors de l\'envoi:', error); // Debug log
                 submitBtn.innerHTML = '<span>Erreur !</span> <i class="fas fa-exclamation-triangle"></i>';
-                console.error('Erreur:', error);
                 
                 setTimeout(() => {
                     submitBtn.innerHTML = originalText;
@@ -225,6 +233,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 }, 2000);
             }
         });
+    } else {
+        console.error('Formulaire de contact non trouvé'); // Debug log
     }
     
     // Animation de l'indicateur de défilement
