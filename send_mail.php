@@ -15,6 +15,8 @@ function logError($message) {
 }
 
 logError("Début du traitement de la requête");
+logError("Méthode: " . $_SERVER['REQUEST_METHOD']);
+logError("Content-Type: " . $_SERVER['CONTENT_TYPE']);
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     logError("Méthode non autorisée: " . $_SERVER['REQUEST_METHOD']);
@@ -23,23 +25,23 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-// Log the raw input
-$raw_input = file_get_contents('php://input');
-logError("Raw input: " . $raw_input);
+// Récupérer les données POST
+$name = $_POST['name'] ?? '';
+$email = $_POST['email'] ?? '';
+$message = $_POST['message'] ?? '';
 
-$data = json_decode($raw_input, true);
-logError("Données décodées: " . print_r($data, true));
+logError("Données reçues - Nom: $name, Email: $email");
 
-if (!isset($data['name']) || !isset($data['email']) || !isset($data['message'])) {
+if (empty($name) || empty($email) || empty($message)) {
     logError("Champs manquants dans la requête");
     http_response_code(400);
     echo json_encode(['error' => 'Missing required fields']);
     exit;
 }
 
-$name = filter_var($data['name'], FILTER_SANITIZE_STRING);
-$email = filter_var($data['email'], FILTER_SANITIZE_EMAIL);
-$message = filter_var($data['message'], FILTER_SANITIZE_STRING);
+$name = filter_var($name, FILTER_SANITIZE_STRING);
+$email = filter_var($email, FILTER_SANITIZE_EMAIL);
+$message = filter_var($message, FILTER_SANITIZE_STRING);
 
 logError("Données filtrées - Nom: $name, Email: $email");
 

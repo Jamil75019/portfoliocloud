@@ -174,85 +174,74 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Gestion du formulaire de contact
+    console.log('Recherche du formulaire de contact...'); // Debug log
     const contactForm = document.getElementById('contact-form');
-    console.log('Recherche du formulaire...'); // Debug log
     console.log('Formulaire trouvé:', contactForm); // Debug log
 
     if (contactForm) {
         console.log('Ajout du gestionnaire d\'événement submit...'); // Debug log
         
         contactForm.addEventListener('submit', async function(e) {
-            console.log('Formulaire soumis - Événement:', e); // Debug log
+            console.log('Formulaire soumis!'); // Debug log
             e.preventDefault();
+            console.log('Événement par défaut empêché'); // Debug log
             
-            // Animation de soumission
             const submitBtn = this.querySelector('.btn-submit');
             const originalText = submitBtn.innerHTML;
             
             submitBtn.innerHTML = '<span>Envoi en cours...</span> <i class="fas fa-spinner fa-spin"></i>';
             submitBtn.disabled = true;
+            console.log('Bouton désactivé et texte mis à jour'); // Debug log
             
-            // Récupérer les données du formulaire
-            const formData = {
-                name: document.getElementById('name').value,
-                email: document.getElementById('email').value,
-                message: document.getElementById('message').value
-            };
-            
-            console.log('Données du formulaire:', formData); // Debug log
+            const formData = new FormData(this);
+            console.log('FormData créé:', formData); // Debug log
             
             try {
-                console.log('Envoi de la requête à send_mail.php'); // Debug log
+                console.log('Début de l\'envoi de la requête à send_mail.php'); // Debug log
                 const response = await fetch('send_mail.php', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(formData)
+                    body: formData
                 });
                 
                 console.log('Réponse reçue:', response); // Debug log
+                console.log('Status:', response.status); // Debug log
                 
-                // Récupérer d'abord le texte brut de la réponse
                 const responseText = await response.text();
-                console.log('Réponse brute:', responseText);
+                console.log('Réponse brute:', responseText); // Debug log
                 
                 let result;
                 try {
                     result = JSON.parse(responseText);
+                    console.log('Réponse parsée:', result); // Debug log
                 } catch (parseError) {
                     console.error('Erreur de parsing JSON:', parseError);
                     console.error('Contenu reçu:', responseText);
                     throw new Error('Réponse invalide du serveur');
                 }
                 
-                console.log('Résultat:', result); // Debug log
-                
                 if (result.success) {
+                    console.log('Email envoyé avec succès'); // Debug log
                     submitBtn.innerHTML = '<span>Envoyé !</span> <i class="fas fa-check"></i>';
                     contactForm.reset();
-                    
-                    setTimeout(() => {
-                        submitBtn.innerHTML = originalText;
-                        submitBtn.disabled = false;
-                    }, 2000);
                 } else {
+                    console.error('Erreur retournée par le serveur:', result.error); // Debug log
                     throw new Error(result.error || 'Erreur lors de l\'envoi');
                 }
             } catch (error) {
-                console.error('Erreur lors de l\'envoi:', error); // Debug log
+                console.error('Erreur lors de l\'envoi:', error);
                 submitBtn.innerHTML = '<span>Erreur !</span> <i class="fas fa-exclamation-triangle"></i>';
-                
-                setTimeout(() => {
-                    submitBtn.innerHTML = originalText;
-                    submitBtn.disabled = false;
-                }, 2000);
             }
+            
+            setTimeout(() => {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+                console.log('Bouton réinitialisé'); // Debug log
+            }, 2000);
         });
         
         console.log('Gestionnaire d\'événement submit ajouté avec succès'); // Debug log
     } else {
-        console.error('Formulaire de contact non trouvé'); // Debug log
+        console.error('Formulaire de contact non trouvé!'); // Debug log
     }
     
     // Animation de l'indicateur de défilement
