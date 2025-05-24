@@ -176,7 +176,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Gestion du formulaire de contact
     const contactForm = document.getElementById('contact-form');
     if (contactForm) {
-        contactForm.addEventListener('submit', function(e) {
+        contactForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             
             // Animation de soumission
@@ -186,17 +186,44 @@ document.addEventListener('DOMContentLoaded', function() {
             submitBtn.innerHTML = '<span>Envoi en cours...</span> <i class="fas fa-spinner fa-spin"></i>';
             submitBtn.disabled = true;
             
-            // Simuler l'envoi (remplacer par votre logique d'envoi réel)
-            setTimeout(() => {
-                submitBtn.innerHTML = '<span>Envoyé !</span> <i class="fas fa-check"></i>';
+            // Récupérer les données du formulaire
+            const formData = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                message: document.getElementById('message').value
+            };
+            
+            try {
+                const response = await fetch('/send_mail.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
                 
-                // Réinitialiser le formulaire
-                setTimeout(() => {
+                const result = await response.json();
+                
+                if (result.success) {
+                    submitBtn.innerHTML = '<span>Envoyé !</span> <i class="fas fa-check"></i>';
                     contactForm.reset();
+                    
+                    setTimeout(() => {
+                        submitBtn.innerHTML = originalText;
+                        submitBtn.disabled = false;
+                    }, 2000);
+                } else {
+                    throw new Error(result.error || 'Erreur lors de l\'envoi');
+                }
+            } catch (error) {
+                submitBtn.innerHTML = '<span>Erreur !</span> <i class="fas fa-exclamation-triangle"></i>';
+                console.error('Erreur:', error);
+                
+                setTimeout(() => {
                     submitBtn.innerHTML = originalText;
                     submitBtn.disabled = false;
                 }, 2000);
-            }, 1500);
+            }
         });
     }
     
