@@ -175,12 +175,15 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Gestion du formulaire de contact
     const contactForm = document.getElementById('contact-form');
+    console.log('Recherche du formulaire...'); // Debug log
     console.log('Formulaire trouvé:', contactForm); // Debug log
 
     if (contactForm) {
+        console.log('Ajout du gestionnaire d\'événement submit...'); // Debug log
+        
         contactForm.addEventListener('submit', async function(e) {
+            console.log('Formulaire soumis - Événement:', e); // Debug log
             e.preventDefault();
-            console.log('Formulaire soumis'); // Debug log
             
             // Animation de soumission
             const submitBtn = this.querySelector('.btn-submit');
@@ -210,7 +213,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 console.log('Réponse reçue:', response); // Debug log
                 
-                const result = await response.json();
+                // Récupérer d'abord le texte brut de la réponse
+                const responseText = await response.text();
+                console.log('Réponse brute:', responseText);
+                
+                let result;
+                try {
+                    result = JSON.parse(responseText);
+                } catch (parseError) {
+                    console.error('Erreur de parsing JSON:', parseError);
+                    console.error('Contenu reçu:', responseText);
+                    throw new Error('Réponse invalide du serveur');
+                }
+                
                 console.log('Résultat:', result); // Debug log
                 
                 if (result.success) {
@@ -234,6 +249,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 }, 2000);
             }
         });
+        
+        console.log('Gestionnaire d\'événement submit ajouté avec succès'); // Debug log
     } else {
         console.error('Formulaire de contact non trouvé'); // Debug log
     }
