@@ -20,8 +20,7 @@ logError("Content-Type: " . $_SERVER['CONTENT_TYPE']);
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     logError("Méthode non autorisée: " . $_SERVER['REQUEST_METHOD']);
-    http_response_code(405);
-    echo json_encode(['error' => 'Method not allowed']);
+    header('Location: /?error=method');
     exit;
 }
 
@@ -34,8 +33,7 @@ logError("Données reçues - Nom: $name, Email: $email");
 
 if (empty($name) || empty($email) || empty($message)) {
     logError("Champs manquants dans la requête");
-    http_response_code(400);
-    echo json_encode(['error' => 'Missing required fields']);
+    header('Location: /?error=missing');
     exit;
 }
 
@@ -47,8 +45,7 @@ logError("Données filtrées - Nom: $name, Email: $email");
 
 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
     logError("Format d'email invalide: $email");
-    http_response_code(400);
-    echo json_encode(['error' => 'Invalid email format']);
+    header('Location: /?error=email');
     exit;
 }
 
@@ -72,9 +69,9 @@ $mail_result = mail($to, $subject, $email_content, $headers);
 logError("Résultat de l'envoi: " . ($mail_result ? "Succès" : "Échec"));
 
 if ($mail_result) {
-    echo json_encode(['success' => true, 'message' => 'Email sent successfully']);
+    header('Location: /?success=1');
 } else {
     logError("Erreur lors de l'envoi de l'email - Erreur PHP: " . error_get_last()['message']);
-    http_response_code(500);
-    echo json_encode(['error' => 'Failed to send email']);
-} 
+    header('Location: /?error=send');
+}
+exit; 
