@@ -1,4 +1,7 @@
 <?php
+// Force un log dans le fichier error_log d'Apache
+error_log("Le script send_mail.php a été appelé!", 0);
+
 // Activer l'affichage des erreurs
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
@@ -11,7 +14,7 @@ header('Access-Control-Allow-Headers: Content-Type');
 
 // Logging function
 function logError($message) {
-    error_log("[" . date('Y-m-d H:i:s') . "] " . $message . "\n", 3, "/var/log/apache2/php_error.log");
+    error_log("[" . date('Y-m-d H:i:s') . "] " . $message . "\n", 0);
 }
 
 logError("Début du traitement de la requête");
