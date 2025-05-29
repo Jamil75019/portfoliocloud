@@ -4,9 +4,9 @@ let domains = [];
 
 async function loadDomains() {
     try {
-        const response = await fetch("phishing_like_domains.json?ts=" + Date.now());
-        domains = await response.json();
-        renderPage(currentPage);
+    const response = await fetch("phishing_like_domains.json?ts=" + Date.now());
+    domains = await response.json();
+    renderPage(currentPage);
     } catch (error) {
         console.error("Erreur lors du chargement des domaines:", error);
     }
@@ -58,27 +58,27 @@ function setupEventListeners() {
     
     if (prevButton) {
         prevButton.addEventListener("click", () => {
-            if (currentPage > 1) {
-                currentPage--;
-                renderPage(currentPage);
-            }
-        });
+        if (currentPage > 1) {
+            currentPage--;
+            renderPage(currentPage);
+        }
+    });
     }
-    
+
     if (nextButton) {
         nextButton.addEventListener("click", () => {
-            if (currentPage < Math.ceil(domains.length / domainsPerPage)) {
-                currentPage++;
-                renderPage(currentPage);
-            }
-        });
+        if (currentPage < Math.ceil(domains.length / domainsPerPage)) {
+            currentPage++;
+            renderPage(currentPage);
+        }
+    });
     }
-    
+
     if (lastButton) {
         lastButton.addEventListener("click", () => {
-            currentPage = Math.ceil(domains.length / domainsPerPage);
-            renderPage(currentPage);
-        });
+        currentPage = Math.ceil(domains.length / domainsPerPage);
+        renderPage(currentPage);
+    });
     }
 }
 
@@ -89,7 +89,7 @@ document.addEventListener("DOMContentLoaded", () => {
         setupEventListeners();
         loadDomains();
     }, 100);
-    
+
     // ♻️ Recharge auto toutes les 60 secondes
     setInterval(() => {
         loadDomains();
