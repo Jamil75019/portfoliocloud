@@ -183,30 +183,84 @@ async def search_bing(query: str, max_pages: int = 5) -> List[LinkedInProfile]:
             for link in linkedin_links[:5]:  # Limiter à 5 profils pour le test
                 try:
                     print(f"Visite du profil: {link}")
-                    await page.goto(link, wait_until='networkidle', timeout=10000)
                     
-                    # Extraire les infos du profil
+                    # Ajouter des cookies pour simuler une session
+                    await page.context.add_cookies([
+                        {'name': 'lang', 'value': 'v=2&lang=fr-fr', 'domain': '.linkedin.com', 'path': '/'},
+                        {'name': 'bcookie', 'value': 'v=2&test=test', 'domain': '.linkedin.com', 'path': '/'}
+                    ])
+                    
+                    await page.goto(link, wait_until='networkidle', timeout=10000)
+                    await asyncio.sleep(2)
+                    
+                    # Vérifier si on est sur une page de connexion
+                    is_login_page = await page.evaluate('''() => {
+                        return document.title.includes('Connectez-vous') || 
+                               document.title.includes('Sign in') ||
+                               document.querySelector('.auth-form') !== null ||
+                               window.location.href.includes('/authwall') ||
+                               window.location.href.includes('/signup');
+                    }''')
+                    
+                    if is_login_page:
+                        print(f"Page de connexion détectée pour {link}, on extrait depuis Bing")
+                        
+                        # Extraire le nom depuis l'URL LinkedIn
+                        name_from_url = link.split('/in/')[-1].replace('-', ' ').title()
+                        if name_from_url.endswith('/'):
+                            name_from_url = name_from_url[:-1]
+                        
+                        profile = LinkedInProfile(
+                            name=name_from_url,
+                            position="Poste à déterminer",
+                            company="Entreprise à déterminer", 
+                            description="Profil détecté via Bing",
+                            url=link,
+                            emails=generate_emails(name_from_url, "company")
+                        )
+                        
+                        profiles.append(profile)
+                        print(f"Profil ajouté (depuis URL): {profile.name}")
+                        continue
+                    
+                    # Extraire les infos du profil si pas de page de connexion
                     profile_data = await page.evaluate('''() => {
                         const getName = () => {
-                            return document.querySelector('h1')?.textContent?.trim() || 'Nom non trouvé';
+                            const selectors = [
+                                'h1.text-heading-xlarge',
+                                'h1.top-card-layout__title', 
+                                'h1',
+                                '.pv-text-details__left-panel h1',
+                                '.pv-top-card--list li:first-child h1'
+                            ];
+                            for (let selector of selectors) {
+                                const el = document.querySelector(selector);
+                                if (el && el.textContent && !el.textContent.includes('inscrire')) {
+                                    return el.textContent.trim();
+                                }
+                            }
+                            return 'Nom non trouvé';
                         };
                         
                         const getPosition = () => {
                             const selectors = [
                                 '.text-body-medium.break-words',
                                 '.top-card-layout__headline',
+                                '.pv-text-details__left-panel .text-body-medium',
                                 '[data-generated-suggestion-target]'
                             ];
                             for (let selector of selectors) {
                                 const el = document.querySelector(selector);
-                                if (el && el.textContent) return el.textContent.trim();
+                                if (el && el.textContent && !el.textContent.includes('inscrire')) {
+                                    return el.textContent.trim();
+                                }
                             }
                             return 'Poste non trouvé';
                         };
                         
                         const getCompany = () => {
-                            const text = getPosition();
-                            const match = text.match(/(?:at|chez|@)\\s+(.+?)(?:$|\\||,)/i);
+                            const position = getPosition();
+                            const match = position.match(/(?:at|chez|@)\\s+(.+?)(?:$|\\||,)/i);
                             return match ? match[1].trim() : 'Entreprise non trouvée';
                         };
                         
@@ -214,9 +268,12 @@ async def search_bing(query: str, max_pages: int = 5) -> List[LinkedInProfile]:
                             name: getName(),
                             position: getPosition(),
                             company: getCompany(),
-                            url: window.location.href
+                            url: window.location.href,
+                            title: document.title
                         };
                     }''')
+                    
+                    print(f"Données extraites: {profile_data}")
                     
                     # Générer des emails probables
                     emails = generate_emails(profile_data['name'], profile_data['company'])
@@ -234,7 +291,7 @@ async def search_bing(query: str, max_pages: int = 5) -> List[LinkedInProfile]:
                     print(f"Profil ajouté: {profile.name}")
                     
                     # Pause pour éviter de se faire bloquer
-                    await asyncio.sleep(random.uniform(1, 3))
+                    await asyncio.sleep(random.uniform(2, 4))
                     
                 except Exception as e:
                     print(f"Erreur lors du scraping de {link}: {e}")
