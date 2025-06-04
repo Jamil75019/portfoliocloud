@@ -2,8 +2,7 @@
 RewriteEngine On
 
 # Rediriger les requêtes API vers le serveur Flask
-RewriteCond %{REQUEST_URI} ^/api/rhscrap/
-RewriteRule ^api/rhscrap/(.*)$ http://localhost:5000/api/rhscrap/$1 [P,L]
+RewriteRule ^api/rhscrap/search$ http://localhost:5000/rhscrap/search [P,L]
 
 # Servir les fichiers statiques directement
 RewriteCond %{REQUEST_FILENAME} !-f
