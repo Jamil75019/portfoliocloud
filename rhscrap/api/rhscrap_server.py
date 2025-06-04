@@ -124,17 +124,46 @@ async def search_bing(query: str, max_pages: int = 5) -> List[LinkedInProfile]:
             # Extraire les liens LinkedIn
             linkedin_links = await page.evaluate('''() => {
                 const links = [];
-                const elements = document.querySelectorAll('a[href*="linkedin.com/in/"]');
-                for (let el of elements) {
-                    const href = el.href;
-                    if (href.includes('linkedin.com/in/') && !links.includes(href)) {
-                        links.push(href);
+                
+                // Plusieurs sélecteurs pour trouver les liens LinkedIn
+                const selectors = [
+                    'a[href*="linkedin.com/in/"]',
+                    'a[href*="linkedin.com"]',
+                    'h2 a[href*="linkedin.com"]',
+                    '.b_algo h2 a[href*="linkedin.com"]',
+                    '.b_title a[href*="linkedin.com"]'
+                ];
+                
+                for (let selector of selectors) {
+                    const elements = document.querySelectorAll(selector);
+                    for (let el of elements) {
+                        let href = el.href;
+                        if (href && href.includes('linkedin.com/in/') && !links.includes(href)) {
+                            // Nettoyer l'URL (enlever les paramètres Bing)
+                            href = href.split('?')[0];
+                            links.push(href);
+                        }
                     }
                 }
+                
+                console.log('Liens trouvés:', links);
                 return links.slice(0, 10); // Max 10 liens par page
             }''')
             
             print(f"Trouvé {len(linkedin_links)} liens LinkedIn")
+            
+            # Si pas de liens trouvés, debugger la page
+            if len(linkedin_links) == 0:
+                print("Aucun lien trouvé, debug de la page...")
+                page_content = await page.evaluate('''() => {
+                    return {
+                        title: document.title,
+                        url: window.location.href,
+                        allLinks: Array.from(document.querySelectorAll('a')).slice(0, 5).map(a => a.href),
+                        hasResults: !!document.querySelector('.b_algo, .b_title')
+                    };
+                }''')
+                print(f"Debug page: {page_content}")
             
             # Visiter chaque profil LinkedIn
             for link in linkedin_links[:5]:  # Limiter à 5 profils pour le test
