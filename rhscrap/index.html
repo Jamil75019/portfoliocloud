@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RHScrap Web - LinkedIn Profile Scraper</title>
+    <link href="../style.css" rel="stylesheet">
+    <link href="style.css" rel="stylesheet">
+</head>
+<body class="dark">
+    <div class="container">
+        <nav class="navbar">
+            <a href="../index.html" class="nav-link">← Retour au Portfolio</a>
+        </nav>
+
+        <div class="rhscrap-container">
+            <h1 class="title">RHScrap Web</h1>
+            <p class="subtitle">Trouvez des profils et emails professionnels en quelques clics</p>
+            
+            <div class="search-container">
+                <div class="search-box">
+                    <label>Recherche LinkedIn</label>
+                    <input type="text" id="search" placeholder="Ex: RH France Orange">
+                </div>
+
+                <div class="filters">
+                    <div class="filter-box">
+                        <label>Entreprise (optionnel)</label>
+                        <input type="text" id="enterprise" placeholder="Nom de l'entreprise">
+                    </div>
+                    <div class="filter-box">
+                        <label>Localisation (optionnel)</label>
+                        <input type="text" id="location" placeholder="Ville ou région">
+                    </div>
+                </div>
+
+                <button id="startSearch" class="primary-button">
+                    Lancer la recherche
+                </button>
+            </div>
+
+            <div id="progress" class="progress-container hidden">
+                <div class="progress-bar">
+                    <div class="progress-fill"></div>
+                </div>
+                <p class="progress-text">Recherche en cours...</p>
+            </div>
+
+            <div id="results" class="results-container"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html> 
