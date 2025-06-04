@@ -1,15 +1,13 @@
 # Activer le module rewrite
 RewriteEngine On
 
-# Rediriger les requêtes API vers le serveur Flask
-RewriteRule ^search$ http://127.0.0.1:5000/rhscrap/search [P,L]
-
 # Headers pour CORS
 Header set Access-Control-Allow-Origin "*"
 Header set Access-Control-Allow-Methods "GET, POST, OPTIONS"
 Header set Access-Control-Allow-Headers "Content-Type, Accept"
 
-# Activer le mode proxy
+# Redirection vers Flask
+ProxyPreserveHost On
 ProxyPass /rhscrap/search http://127.0.0.1:5000/rhscrap/search
 ProxyPassReverse /rhscrap/search http://127.0.0.1:5000/rhscrap/search
 
