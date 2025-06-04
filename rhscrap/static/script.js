@@ -89,7 +89,10 @@ document.addEventListener('DOMContentLoaded', () => {
         updateProgress(0);
 
         try {
-            const response = await fetch('/rhscrap/search', {
+            // Construire l'URL en fonction de l'environnement
+            const baseUrl = window.location.origin;
+            console.log("Base URL:", baseUrl); // Debug
+            const response = await fetch(`${baseUrl}/rhscrap/search`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -101,6 +104,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     location: locationInput.value.trim()
                 })
             });
+
+            console.log("Response status:", response.status); // Debug
 
             if (!response.ok) {
                 throw new Error('Erreur lors de la recherche');
