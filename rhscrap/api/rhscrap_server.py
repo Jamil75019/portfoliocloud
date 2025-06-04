@@ -135,166 +135,79 @@ async def search_bing(query: str, max_pages: int = 5) -> List[LinkedInProfile]:
             # Attendre un peu plus pour que les résultats se chargent
             await asyncio.sleep(3)
             
-            # Extraire les liens LinkedIn
-            linkedin_links = await page.evaluate('''() => {
-                const links = [];
+            # Extraire les liens LinkedIn avec leurs descriptions
+            search_results = await page.evaluate('''() => {
+                const results = [];
                 
-                // Plusieurs sélecteurs pour trouver les liens LinkedIn
-                const selectors = [
-                    'a[href*="linkedin.com/in/"]',
-                    'a[href*="linkedin.com"]',
-                    'h2 a[href*="linkedin.com"]',
-                    '.b_algo h2 a[href*="linkedin.com"]',
-                    '.b_title a[href*="linkedin.com"]'
-                ];
+                // Chercher les résultats de recherche Bing
+                const resultContainers = document.querySelectorAll('.b_algo, .b_title');
                 
-                for (let selector of selectors) {
-                    const elements = document.querySelectorAll(selector);
-                    for (let el of elements) {
-                        let href = el.href;
-                        if (href && href.includes('linkedin.com/in/') && !links.includes(href)) {
-                            // Nettoyer l'URL (enlever les paramètres Bing)
+                for (let container of resultContainers) {
+                    const linkEl = container.querySelector('a[href*="linkedin.com/in/"]');
+                    if (linkEl) {
+                        let href = linkEl.href;
+                        if (href && href.includes('linkedin.com/in/')) {
+                            // Nettoyer l'URL
                             href = href.split('?')[0];
-                            links.push(href);
+                            
+                            // Extraire le titre et la description
+                            const titleEl = container.querySelector('h2, .b_title h2, .b_algo h2');
+                            const descEl = container.querySelector('.b_caption p, .b_snippet, .b_algoSlug');
+                            
+                            const title = titleEl ? titleEl.textContent.trim() : '';
+                            const description = descEl ? descEl.textContent.trim() : '';
+                            
+                            results.push({
+                                url: href,
+                                title: title,
+                                description: description
+                            });
                         }
                     }
                 }
                 
-                console.log('Liens trouvés:', links);
-                return links.slice(0, 10); // Max 10 liens par page
+                console.log('Résultats Bing avec descriptions:', results);
+                return results.slice(0, 10);
             }''')
             
-            print(f"Trouvé {len(linkedin_links)} liens LinkedIn")
+            print(f"Trouvé {len(search_results)} résultats avec descriptions")
             
-            # Si pas de liens trouvés, debugger la page
-            if len(linkedin_links) == 0:
-                print("Aucun lien trouvé, debug de la page...")
-                page_content = await page.evaluate('''() => {
-                    return {
-                        title: document.title,
-                        url: window.location.href,
-                        allLinks: Array.from(document.querySelectorAll('a')).slice(0, 5).map(a => a.href),
-                        hasResults: !!document.querySelector('.b_algo, .b_title')
-                    };
-                }''')
-                print(f"Debug page: {page_content}")
-            
-            # Visiter chaque profil LinkedIn
-            for link in linkedin_links[:5]:  # Limiter à 5 profils pour le test
+            # Traiter chaque résultat
+            for result in search_results[:5]:
                 try:
-                    print(f"Visite du profil: {link}")
+                    print(f"Traitement: {result['url']}")
+                    print(f"Titre: {result['title']}")
+                    print(f"Description: {result['description']}")
                     
-                    # Ajouter des cookies pour simuler une session
-                    await page.context.add_cookies([
-                        {'name': 'lang', 'value': 'v=2&lang=fr-fr', 'domain': '.linkedin.com', 'path': '/'},
-                        {'name': 'bcookie', 'value': 'v=2&test=test', 'domain': '.linkedin.com', 'path': '/'}
-                    ])
+                    # Extraire le nom depuis l'URL
+                    name_from_url = result['url'].split('/in/')[-1].replace('-', ' ').title()
+                    if name_from_url.endswith('/'):
+                        name_from_url = name_from_url[:-1]
                     
-                    await page.goto(link, wait_until='networkidle', timeout=10000)
-                    await asyncio.sleep(2)
+                    # Nettoyer le nom (enlever les codes)
+                    name_clean = re.sub(r'\s+[A-Z0-9]{8,}$', '', name_from_url)
                     
-                    # Vérifier si on est sur une page de connexion
-                    is_login_page = await page.evaluate('''() => {
-                        return document.title.includes('Connectez-vous') || 
-                               document.title.includes('Sign in') ||
-                               document.querySelector('.auth-form') !== null ||
-                               window.location.href.includes('/authwall') ||
-                               window.location.href.includes('/signup');
-                    }''')
+                    # Extraire le poste et l'entreprise depuis le titre et la description Bing
+                    position, company = extract_position_company_from_bing(result['title'], result['description'])
                     
-                    if is_login_page:
-                        print(f"Page de connexion détectée pour {link}, on extrait depuis Bing")
-                        
-                        # Extraire le nom depuis l'URL LinkedIn
-                        name_from_url = link.split('/in/')[-1].replace('-', ' ').title()
-                        if name_from_url.endswith('/'):
-                            name_from_url = name_from_url[:-1]
-                        
-                        profile = LinkedInProfile(
-                            name=name_from_url,
-                            position="Poste à déterminer",
-                            company="Entreprise à déterminer", 
-                            description="Profil détecté via Bing",
-                            url=link,
-                            emails=generate_emails(name_from_url, "company")
-                        )
-                        
-                        profiles.append(profile)
-                        print(f"Profil ajouté (depuis URL): {profile.name}")
-                        continue
-                    
-                    # Extraire les infos du profil si pas de page de connexion
-                    profile_data = await page.evaluate('''() => {
-                        const getName = () => {
-                            const selectors = [
-                                'h1.text-heading-xlarge',
-                                'h1.top-card-layout__title', 
-                                'h1',
-                                '.pv-text-details__left-panel h1',
-                                '.pv-top-card--list li:first-child h1'
-                            ];
-                            for (let selector of selectors) {
-                                const el = document.querySelector(selector);
-                                if (el && el.textContent && !el.textContent.includes('inscrire')) {
-                                    return el.textContent.trim();
-                                }
-                            }
-                            return 'Nom non trouvé';
-                        };
-                        
-                        const getPosition = () => {
-                            const selectors = [
-                                '.text-body-medium.break-words',
-                                '.top-card-layout__headline',
-                                '.pv-text-details__left-panel .text-body-medium',
-                                '[data-generated-suggestion-target]'
-                            ];
-                            for (let selector of selectors) {
-                                const el = document.querySelector(selector);
-                                if (el && el.textContent && !el.textContent.includes('inscrire')) {
-                                    return el.textContent.trim();
-                                }
-                            }
-                            return 'Poste non trouvé';
-                        };
-                        
-                        const getCompany = () => {
-                            const position = getPosition();
-                            const match = position.match(/(?:at|chez|@)\\s+(.+?)(?:$|\\||,)/i);
-                            return match ? match[1].trim() : 'Entreprise non trouvée';
-                        };
-                        
-                        return {
-                            name: getName(),
-                            position: getPosition(),
-                            company: getCompany(),
-                            url: window.location.href,
-                            title: document.title
-                        };
-                    }''')
-                    
-                    print(f"Données extraites: {profile_data}")
-                    
-                    # Générer des emails probables
-                    emails = generate_emails(profile_data['name'], profile_data['company'])
+                    # Générer des emails avec la vraie entreprise si trouvée
+                    company_for_email = company if company != "Entreprise à déterminer" else "company"
+                    emails = generate_emails(name_clean, company_for_email)
                     
                     profile = LinkedInProfile(
-                        name=profile_data['name'],
-                        position=profile_data['position'],
-                        company=profile_data['company'],
-                        description=profile_data['position'],
-                        url=profile_data['url'],
+                        name=name_clean,
+                        position=position,
+                        company=company,
+                        description=result['description'][:200] + "..." if len(result['description']) > 200 else result['description'],
+                        url=result['url'],
                         emails=emails
                     )
                     
                     profiles.append(profile)
-                    print(f"Profil ajouté: {profile.name}")
-                    
-                    # Pause pour éviter de se faire bloquer
-                    await asyncio.sleep(random.uniform(2, 4))
+                    print(f"Profil ajouté: {profile.name} - {profile.position} chez {profile.company}")
                     
                 except Exception as e:
-                    print(f"Erreur lors du scraping de {link}: {e}")
+                    print(f"Erreur lors du traitement de {result.get('url', 'URL inconnue')}: {e}")
                     continue
             
             await browser.close()
@@ -337,6 +250,92 @@ def generate_emails(name: str, company: str) -> List[Tuple[str, float]]:
             emails.append((email, prob))
     
     return emails
+
+def extract_position_company_from_bing(title: str, description: str) -> Tuple[str, str]:
+    """
+    Extrait le poste et l'entreprise depuis le titre et la description Bing
+    """
+    full_text = f"{title} {description}".lower()
+    
+    # Extraire le poste
+    position = "Poste à déterminer"
+    
+    # Patterns pour les postes courants
+    position_patterns = [
+        r'directeur(?:rice)?\s+(?:des?\s+)?(?:ressources\s+humaines|rh)',
+        r'responsable\s+(?:des?\s+)?(?:ressources\s+humaines|rh)',
+        r'manager\s+(?:des?\s+)?(?:ressources\s+humaines|rh)',
+        r'chef\s+(?:des?\s+)?(?:ressources\s+humaines|rh)',
+        r'drh|drhei|drhou',
+        r'rrh',
+        r'directeur(?:rice)?\s+(?:général|marketing|commercial|financier|technique)',
+        r'responsable\s+(?:marketing|commercial|ventes|production|qualité)',
+        r'manager\s+(?:marketing|commercial|ventes|équipe)',
+        r'consultant(?:e)?\s+(?:en|rh|ressources)',
+        r'chargé(?:e)?\s+(?:de|du|des)\s+(?:recrutement|formation|paie)',
+        r'président(?:e)?',
+        r'pdg|ceo|cto|cfo',
+        r'associé(?:e)?\s+(?:fondateur|gérant)',
+        r'expert(?:e)?\s+(?:en|comptable)'
+    ]
+    
+    for pattern in position_patterns:
+        match = re.search(pattern, full_text)
+        if match:
+            position = match.group(0).title()
+            break
+    
+    # Extraire l'entreprise
+    company = "Entreprise à déterminer"
+    
+    # Patterns pour les entreprises connues
+    company_patterns = [
+        r'orange(?:\s+france|\s+tunisie)?',
+        r'total(?:\s+energies)?',
+        r'bnp\s+paribas',
+        r'société\s+générale',
+        r'crédit\s+agricole',
+        r'peugeot(?:\s+citroën)?',
+        r'renault(?:\s+nissan)?',
+        r'airbus(?:\s+defence)?',
+        r'thales(?:\s+group)?',
+        r'capgemini',
+        r'accenture',
+        r'deloitte',
+        r'pwc',
+        r'kpmg',
+        r'ernst\s+&\s+young',
+        r'mckinsey',
+        r'microsoft',
+        r'google',
+        r'amazon',
+        r'apple',
+        r'ibm',
+        r'oracle'
+    ]
+    
+    # Chercher dans le titre d'abord
+    for pattern in company_patterns:
+        match = re.search(pattern, title.lower())
+        if match:
+            company = match.group(0).title()
+            break
+    
+    # Si pas trouvé dans le titre, chercher dans la description
+    if company == "Entreprise à déterminer":
+        for pattern in company_patterns:
+            match = re.search(pattern, description.lower())
+            if match:
+                company = match.group(0).title()
+                break
+    
+    # Pattern générique "chez [Entreprise]"
+    if company == "Entreprise à déterminer":
+        chez_match = re.search(r'chez\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)', title + " " + description)
+        if chez_match:
+            company = chez_match.group(1)
+    
+    return position, company
 
 def filter_profile(profile: LinkedInProfile, filters: SearchFilters) -> bool:
     """
