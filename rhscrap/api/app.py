@@ -9,7 +9,7 @@ from rhscrap_server import search_bing, SearchFilters, save_results, filter_prof
 app = Flask(__name__)
 CORS(app)
 
-@app.route('/search', methods=['POST'])  # Changé ici !
+@app.route('/rhscrap/search', methods=['POST'])  # Modifié ici !
 def search():  # Retiré async pour le moment
     try:
         data = request.json
