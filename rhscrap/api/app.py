@@ -38,6 +38,14 @@ def search():
         asyncio.set_event_loop(loop)
         profiles = loop.run_until_complete(search_bing(query, max_pages=5))
         loop.close()
+        
+        print(f"Résultat search_bing: {profiles}")
+        print(f"Type de profiles: {type(profiles)}")
+        
+        if profiles is None:
+            print("ATTENTION: search_bing a retourné None")
+            profiles = []
+        
         print(f"Recherche terminée, {len(profiles)} profils trouvés")
 
         # Filtrer les résultats si nécessaire
