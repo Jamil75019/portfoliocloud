@@ -2,7 +2,7 @@
 RewriteEngine On
 
 # Rediriger les requêtes API vers le serveur Flask
-RewriteRule ^api/rhscrap/search$ http://localhost:5000/rhscrap/search [P,L]
+RewriteRule ^api/rhscrap/search$ http://127.0.0.1:5000/rhscrap/search [P,L]
 
 # Servir les fichiers statiques directement
 RewriteCond %{REQUEST_FILENAME} !-f
@@ -24,4 +24,8 @@ RewriteRule ^static/(.*)$ static/$1 [L]
 # Headers pour CORS
 Header set Access-Control-Allow-Origin "*"
 Header set Access-Control-Allow-Methods "GET, POST, OPTIONS"
-Header set Access-Control-Allow-Headers "Content-Type" 
+Header set Access-Control-Allow-Headers "Content-Type"
+
+# Activer le mode proxy
+ProxyPass /api/rhscrap/search http://127.0.0.1:5000/rhscrap/search
+ProxyPassReverse /api/rhscrap/search http://127.0.0.1:5000/rhscrap/search 
