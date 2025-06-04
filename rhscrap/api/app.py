@@ -34,19 +34,25 @@ def search():
 
         # Lancer la recherche
         print("Lancement de la recherche Bing...")
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        profiles = loop.run_until_complete(search_bing(query, max_pages=5))
-        loop.close()
-        
-        print(f"Résultat search_bing: {profiles}")
-        print(f"Type de profiles: {type(profiles)}")
-        
-        if profiles is None:
-            print("ATTENTION: search_bing a retourné None")
+        try:
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            profiles = loop.run_until_complete(search_bing(query, max_pages=5))
+            loop.close()
+            
+            print(f"Résultat search_bing: {profiles}")
+            print(f"Type de profiles: {type(profiles)}")
+            
+            if profiles is None:
+                print("ATTENTION: search_bing a retourné None")
+                profiles = []
+            
+            print(f"Recherche terminée, {len(profiles)} profils trouvés")
+        except Exception as search_error:
+            print(f"ERREUR dans search_bing: {search_error}")
+            import traceback
+            print(f"TRACEBACK search_bing: {traceback.format_exc()}")
             profiles = []
-        
-        print(f"Recherche terminée, {len(profiles)} profils trouvés")
 
         # Filtrer les résultats si nécessaire
         if enterprise or location:
