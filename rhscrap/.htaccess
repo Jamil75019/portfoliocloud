@@ -5,6 +5,11 @@ RewriteEngine On
 RewriteCond %{REQUEST_URI} ^/api/rhscrap/
 RewriteRule ^api/rhscrap/(.*)$ http://localhost:5000/api/rhscrap/$1 [P,L]
 
+# Servir les fichiers statiques directement
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^static/(.*)$ static/$1 [L]
+
 # Permettre l'accès aux fichiers de résultats
 <Directory "results">
     Options +Indexes
