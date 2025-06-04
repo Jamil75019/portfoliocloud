@@ -113,13 +113,27 @@ async def search_bing(query: str, max_pages: int = 5) -> List[LinkedInProfile]:
             
             page = await browser.new_page()
             
-            # Construire la requête Bing pour LinkedIn
-            search_query = f'site:linkedin.com/in {query}'
+            # Ajouter des headers pour simuler un vrai navigateur
+            await page.set_extra_http_headers({
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+                'Accept-Language': 'fr-FR,fr;q=0.9,en;q=0.8',
+                'Accept-Encoding': 'gzip, deflate, br',
+                'DNT': '1',
+                'Connection': 'keep-alive',
+                'Upgrade-Insecure-Requests': '1'
+            })
+            
+            # Construire la requête Bing pour LinkedIn (recherche plus simple)
+            search_query = f'{query} site:linkedin.com/in'
             bing_url = f'https://www.bing.com/search?q={search_query.replace(" ", "+")}'
             
             print(f"Recherche Bing: {bing_url}")
             
-            await page.goto(bing_url, wait_until='networkidle')
+            await page.goto(bing_url, wait_until='networkidle', timeout=30000)
+            
+            # Attendre un peu plus pour que les résultats se chargent
+            await asyncio.sleep(3)
             
             # Extraire les liens LinkedIn
             linkedin_links = await page.evaluate('''() => {
