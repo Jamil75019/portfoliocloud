@@ -89,8 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateProgress(0);
 
         try {
-            const apiUrl = window.location.pathname.includes('rhscrap') ? '/rhscrap/search' : '/api/rhscrap/search';
-            const response = await fetch(apiUrl, {
+            const response = await fetch('/rhscrap/search', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -3,7 +3,15 @@ RewriteEngine On
 
 # Rediriger les requêtes API vers le serveur Flask
 RewriteRule ^search$ http://127.0.0.1:5000/rhscrap/search [P,L]
-RewriteRule ^api/rhscrap/search$ http://127.0.0.1:5000/rhscrap/search [P,L]
+
+# Headers pour CORS
+Header set Access-Control-Allow-Origin "*"
+Header set Access-Control-Allow-Methods "GET, POST, OPTIONS"
+Header set Access-Control-Allow-Headers "Content-Type, Accept"
+
+# Activer le mode proxy
+ProxyPass /rhscrap/search http://127.0.0.1:5000/rhscrap/search
+ProxyPassReverse /rhscrap/search http://127.0.0.1:5000/rhscrap/search
 
 # Servir les fichiers statiques directement
 RewriteCond %{REQUEST_FILENAME} !-f
@@ -21,12 +29,3 @@ RewriteRule ^static/(.*)$ static/$1 [L]
 <FilesMatch "\.py$">
     Require all denied
 </FilesMatch>
-
-# Headers pour CORS
-Header set Access-Control-Allow-Origin "*"
-Header set Access-Control-Allow-Methods "GET, POST, OPTIONS"
-Header set Access-Control-Allow-Headers "Content-Type, Accept"
-
-# Activer le mode proxy
-ProxyPass /rhscrap/search http://127.0.0.1:5000/rhscrap/search
-ProxyPassReverse /rhscrap/search http://127.0.0.1:5000/rhscrap/search 
