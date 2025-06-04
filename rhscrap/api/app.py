@@ -102,10 +102,19 @@ def search():
                     emails=["test2@testcorp.com"]
                 )
             ]
+            
+            # Sauvegarder à nouveau avec les données de test
+            filename = save_results(profiles, query, results_dir)
+            print(f"Données de test sauvegardées dans: {filename}")
+        
+        # Gérer le cas où filename est None
+        result_url = None
+        if filename:
+            result_url = f'/rhscrap/results/{os.path.basename(filename)}'
         
         response_data = {
             'profiles': [profile.to_dict() for profile in profiles],
-            'resultUrl': f'/rhscrap/results/{os.path.basename(filename)}',
+            'resultUrl': result_url,
             'count': len(profiles)
         }
         print(f"Réponse préparée: {len(response_data['profiles'])} profils")
