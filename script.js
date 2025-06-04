@@ -192,7 +192,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Gestion du formulaire de contact
     console.log('Recherche du formulaire de contact...'); // Debug log
     const contactForm = document.getElementById('contact-form');
-    console.log('Formulaire trouvé:', contactForm); // Debug log
+    console.log('Formulaire trouvé:', contactForm); 
 
     if (contactForm) {
         console.log('Ajout du gestionnaire d\'événement submit...'); // Debug log
@@ -222,6 +222,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.log('Réponse reçue:', response); // Debug log
                 console.log('Status:', response.status); // Debug log
                 
+                if (!response.ok) {
+                    throw new Error(`Erreur HTTP: ${response.status}`);
+                }
+                
                 const responseText = await response.text();
                 console.log('Réponse brute:', responseText); // Debug log
                 
@@ -239,6 +243,17 @@ document.addEventListener('DOMContentLoaded', function() {
                     console.log('Email envoyé avec succès'); // Debug log
                     submitBtn.innerHTML = '<span>Envoyé !</span> <i class="fas fa-check"></i>';
                     contactForm.reset();
+                    
+                    // Afficher un message de succès
+                    const successMessage = document.createElement('div');
+                    successMessage.className = 'alert alert-success';
+                    successMessage.textContent = result.message || 'Message envoyé avec succès !';
+                    contactForm.insertBefore(successMessage, contactForm.firstChild);
+                    
+                    // Supprimer le message après 5 secondes
+                    setTimeout(() => {
+                        successMessage.remove();
+                    }, 5000);
                 } else {
                     console.error('Erreur retournée par le serveur:', result.error); // Debug log
                     throw new Error(result.error || 'Erreur lors de l\'envoi');
@@ -246,8 +261,20 @@ document.addEventListener('DOMContentLoaded', function() {
             } catch (error) {
                 console.error('Erreur lors de l\'envoi:', error);
                 submitBtn.innerHTML = '<span>Erreur !</span> <i class="fas fa-exclamation-triangle"></i>';
+                
+                // Afficher un message d'erreur
+                const errorMessage = document.createElement('div');
+                errorMessage.className = 'alert alert-error';
+                errorMessage.textContent = error.message || 'Une erreur est survenue lors de l\'envoi du message.';
+                contactForm.insertBefore(errorMessage, contactForm.firstChild);
+                
+                // Supprimer le message après 5 secondes
+                setTimeout(() => {
+                    errorMessage.remove();
+                }, 5000);
             }
             
+            // Réinitialiser le bouton après un délai
             setTimeout(() => {
                 submitBtn.innerHTML = originalText;
                 submitBtn.disabled = false;
