@@ -11,6 +11,7 @@ import time
 import random
 import nest_asyncio
 from dns_check import EmailVerifier
+from urllib.parse import unquote
 
 # Permet d'utiliser asyncio
 nest_asyncio.apply()
@@ -66,9 +67,17 @@ def generate_possible_emails(nom: str, domaine: str, company: str) -> List[Tuple
     pass
 
 async def clean_linkedin_title(title: str) -> tuple:
-    # Votre fonction existante clean_linkedin_title
-    # [Code existant]
-    pass
+    """Nettoie le titre LinkedIn et extrait nom/poste (copié de v2 qui marche)"""
+    if " | LinkedIn" in title:
+        title = title.split(" | LinkedIn")[0]
+    if " - LinkedIn" in title:
+        title = title.split(" - LinkedIn")[0]
+    parts = title.split(" - ")
+    if len(parts) >= 2:
+        name = parts[0].strip()
+        position = " - ".join(parts[1:]).strip()
+        return name, position
+    return title.strip(), ""
 
 def save_results(profiles: List[LinkedInProfile], query: str, results_dir: str) -> str:
     """
@@ -369,3 +378,33 @@ def filter_profile(profile: LinkedInProfile, filters: SearchFilters) -> bool:
             return False
     
     return True
+
+def decode_url_name(url: str) -> str:
+    """Décode les noms depuis l'URL LinkedIn et nettoie les codes parasites"""
+    try:
+        # Extraire la partie après /in/
+        name_part = url.split('/in/')[-1]
+        
+        # Enlever le slash final si présent
+        if name_part.endswith('/'):
+            name_part = name_part[:-1]
+        
+        # Décoder l'URL (pour La%C3%Abtitia -> Laëtitia)
+        name_decoded = unquote(name_part)
+        
+        # Remplacer les tirets par des espaces
+        name_with_spaces = name_decoded.replace('-', ' ')
+        
+        # Nettoyer les codes parasites de façon simple mais efficace
+        # Pattern pour les codes LinkedIn (séquences alphanumériques de 8+ caractères)
+        name_clean = re.sub(r'\s+[A-Za-z0-9]{8,}$', '', name_with_spaces)
+        
+        # Capitaliser proprement
+        name_parts = name_clean.split()
+        name_final = ' '.join([part.capitalize() for part in name_parts if part])
+        
+        return name_final
+        
+    except Exception as e:
+        print(f"Erreur lors du décodage du nom: {e}")
+        return ""
