@@ -102,6 +102,7 @@ async def search_bing(query: str, max_pages: int = 5) -> List[LinkedInProfile]:
     Recherche des profils LinkedIn via Bing
     """
     profiles = []
+    max_profiles_per_page = 10
     
     async with async_playwright() as p:
         try:
@@ -124,93 +125,109 @@ async def search_bing(query: str, max_pages: int = 5) -> List[LinkedInProfile]:
                 'Upgrade-Insecure-Requests': '1'
             })
             
-            # Construire la requête Bing pour LinkedIn (recherche plus simple)
-            search_query = f'{query} site:linkedin.com/in'
-            bing_url = f'https://www.bing.com/search?q={search_query.replace(" ", "+")}'
-            
-            print(f"Recherche Bing: {bing_url}")
-            
-            await page.goto(bing_url, wait_until='networkidle', timeout=30000)
-            
-            # Attendre un peu plus pour que les résultats se chargent
-            await asyncio.sleep(3)
-            
-            # Extraire les liens LinkedIn avec leurs descriptions
-            search_results = await page.evaluate('''() => {
-                const results = [];
+            # Scanner plusieurs pages de Bing si nécessaire
+            for page_num in range(1, max_pages + 1):
+                print(f"\n=== PAGE BING {page_num}/{max_pages} ===")
                 
-                // Chercher les résultats de recherche Bing
-                const resultContainers = document.querySelectorAll('.b_algo, .b_title');
+                # Construire la requête Bing pour LinkedIn
+                search_query = f'{query} site:linkedin.com/in'
+                # Ajouter le paramètre first pour paginer (Bing utilise first=11 pour page 2, first=21 pour page 3, etc.)
+                first_param = (page_num - 1) * 10 + 1
+                bing_url = f'https://www.bing.com/search?q={search_query.replace(" ", "+")}&first={first_param}'
                 
-                for (let container of resultContainers) {
-                    const linkEl = container.querySelector('a[href*="linkedin.com/in/"]');
-                    if (linkEl) {
-                        let href = linkEl.href;
-                        if (href && href.includes('linkedin.com/in/')) {
-                            // Nettoyer l'URL
-                            href = href.split('?')[0];
-                            
-                            // Extraire le titre et la description
-                            const titleEl = container.querySelector('h2, .b_title h2, .b_algo h2');
-                            const descEl = container.querySelector('.b_caption p, .b_snippet, .b_algoSlug');
-                            
-                            const title = titleEl ? titleEl.textContent.trim() : '';
-                            const description = descEl ? descEl.textContent.trim() : '';
-                            
-                            results.push({
-                                url: href,
-                                title: title,
-                                description: description
-                            });
-                        }
-                    }
-                }
+                print(f"Recherche Bing: {bing_url}")
                 
-                console.log('Résultats Bing avec descriptions:', results);
-                return results.slice(0, 10);
-            }''')
-            
-            print(f"Trouvé {len(search_results)} résultats avec descriptions")
-            
-            # Traiter chaque résultat
-            for result in search_results[:5]:
-                try:
-                    print(f"Traitement: {result['url']}")
-                    print(f"Titre: {result['title']}")
-                    print(f"Description: {result['description']}")
+                await page.goto(bing_url, wait_until='networkidle', timeout=30000)
+                
+                # Attendre un peu plus pour que les résultats se chargent
+                await asyncio.sleep(2)
+                
+                # Extraire les liens LinkedIn avec leurs descriptions
+                search_results = await page.evaluate(f'''() => {{
+                    const results = [];
                     
-                    # Extraire le nom depuis l'URL
-                    name_from_url = result['url'].split('/in/')[-1].replace('-', ' ').title()
-                    if name_from_url.endswith('/'):
-                        name_from_url = name_from_url[:-1]
+                    // Chercher les résultats de recherche Bing
+                    const resultContainers = document.querySelectorAll('.b_algo, .b_title');
                     
-                    # Nettoyer le nom (enlever les codes)
-                    name_clean = re.sub(r'\s+[A-Z0-9]{8,}$', '', name_from_url)
+                    for (let container of resultContainers) {{
+                        const linkEl = container.querySelector('a[href*="linkedin.com/in/"]');
+                        if (linkEl) {{
+                            let href = linkEl.href;
+                            if (href && href.includes('linkedin.com/in/')) {{
+                                // Nettoyer l'URL
+                                href = href.split('?')[0];
+                                
+                                // Extraire le titre et la description
+                                const titleEl = container.querySelector('h2, .b_title h2, .b_algo h2');
+                                const descEl = container.querySelector('.b_caption p, .b_snippet, .b_algoSlug');
+                                
+                                const title = titleEl ? titleEl.textContent.trim() : '';
+                                const description = descEl ? descEl.textContent.trim() : '';
+                                
+                                results.push({{
+                                    url: href,
+                                    title: title,
+                                    description: description
+                                }});
+                            }}
+                        }}
+                    }}
                     
-                    # Extraire le poste et l'entreprise depuis le titre et la description Bing
-                    position, company = extract_position_company_from_bing(result['title'], result['description'])
-                    
-                    # Générer des emails avec la vraie entreprise si trouvée
-                    company_for_email = company if company != "Entreprise à déterminer" else "company"
-                    emails = generate_emails(name_clean, company_for_email)
-                    
-                    profile = LinkedInProfile(
-                        name=name_clean,
-                        position=position,
-                        company=company,
-                        description=result['description'][:200] + "..." if len(result['description']) > 200 else result['description'],
-                        url=result['url'],
-                        emails=emails
-                    )
-                    
-                    profiles.append(profile)
-                    print(f"Profil ajouté: {profile.name} - {profile.position} chez {profile.company}")
-                    
-                except Exception as e:
-                    print(f"Erreur lors du traitement de {result.get('url', 'URL inconnue')}: {e}")
-                    continue
+                    console.log('Résultats Bing page {page_num}:', results);
+                    return results.slice(0, {max_profiles_per_page});
+                }}''')
+                
+                print(f"Page {page_num}: Trouvé {len(search_results)} résultats")
+                
+                # Traiter chaque résultat de cette page
+                for result in search_results:
+                    try:
+                        print(f"Traitement: {result['url']}")
+                        
+                        # Vérifier si on a déjà ce profil (éviter les doublons)
+                        if any(p.url == result['url'] for p in profiles):
+                            print(f"Profil déjà traité, skip: {result['url']}")
+                            continue
+                        
+                        # Extraire le nom depuis l'URL
+                        name_from_url = result['url'].split('/in/')[-1].replace('-', ' ').title()
+                        if name_from_url.endswith('/'):
+                            name_from_url = name_from_url[:-1]
+                        
+                        # Nettoyer le nom (enlever les codes)
+                        name_clean = re.sub(r'\s+[A-Z0-9]{8,}$', '', name_from_url)
+                        
+                        # Extraire le poste et l'entreprise depuis le titre et la description Bing
+                        position, company = extract_position_company_from_bing(result['title'], result['description'])
+                        
+                        # Générer des emails avec la vraie entreprise si trouvée
+                        company_for_email = company if company != "Entreprise à déterminer" else "company"
+                        emails = generate_emails(name_clean, company_for_email)
+                        
+                        profile = LinkedInProfile(
+                            name=name_clean,
+                            position=position,
+                            company=company,
+                            description=result['description'][:200] + "..." if len(result['description']) > 200 else result['description'],
+                            url=result['url'],
+                            emails=emails
+                        )
+                        
+                        profiles.append(profile)
+                        print(f"✅ Profil ajouté: {profile.name} - {profile.position} chez {profile.company}")
+                        
+                    except Exception as e:
+                        print(f"❌ Erreur lors du traitement de {result.get('url', 'URL inconnue')}: {e}")
+                        continue
+                
+                # Petite pause entre les pages pour éviter d'être détecté
+                if page_num < max_pages:
+                    print(f"Pause avant page suivante...")
+                    await asyncio.sleep(3)
             
             await browser.close()
+            print(f"\n=== RECHERCHE TERMINÉE ===")
+            print(f"Total de profils trouvés: {len(profiles)}")
             
         except Exception as e:
             print(f"Erreur générale dans search_bing: {e}")

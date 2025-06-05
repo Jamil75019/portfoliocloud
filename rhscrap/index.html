@@ -32,6 +32,15 @@
                         <label>Localisation (optionnel)</label>
                         <input type="text" id="location" placeholder="Ville ou région">
                     </div>
+                    <div class="filter-box">
+                        <label>Profondeur de recherche</label>
+                        <select id="searchDepth">
+                            <option value="quick">Recherche rapide (5 profils)</option>
+                            <option value="normal" selected>Recherche normale (10 profils)</option>
+                            <option value="deep">Recherche approfondie (20 profils)</option>
+                            <option value="extensive">Recherche extensive (50 profils)</option>
+                        </select>
+                    </div>
                 </div>
 
                 <button id="startSearch" class="primary-button">

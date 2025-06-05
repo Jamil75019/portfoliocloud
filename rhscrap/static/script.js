@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const searchInput = document.getElementById('search');
     const enterpriseInput = document.getElementById('enterprise');
     const locationInput = document.getElementById('location');
+    const searchDepthSelect = document.getElementById('searchDepth');
     const startButton = document.getElementById('startSearch');
     const progressContainer = document.getElementById('progress');
     const progressBar = progressContainer.querySelector('.progress-fill');
@@ -101,7 +102,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify({
                     query,
                     enterprise: enterpriseInput.value.trim(),
-                    location: locationInput.value.trim()
+                    location: locationInput.value.trim(),
+                    searchDepth: searchDepthSelect.value
                 })
             });
 

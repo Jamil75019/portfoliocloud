@@ -19,10 +19,22 @@ def search():
         query = data.get('query')
         enterprise = data.get('enterprise')
         location = data.get('location')
-        print(f"Query: {query}, Enterprise: {enterprise}, Location: {location}")
+        search_depth = data.get('searchDepth', 'normal')
+        print(f"Query: {query}, Enterprise: {enterprise}, Location: {location}, SearchDepth: {search_depth}")
 
         if not query:
             return jsonify({'error': 'Query is required'}), 400
+
+        # Déterminer le nombre de pages selon la profondeur
+        depth_config = {
+            'quick': {'max_pages': 2, 'max_results': 5},
+            'normal': {'max_pages': 5, 'max_results': 10},  
+            'deep': {'max_pages': 8, 'max_results': 20},
+            'extensive': {'max_pages': 15, 'max_results': 50}
+        }
+        
+        config = depth_config.get(search_depth, depth_config['normal'])
+        print(f"Configuration recherche: {config}")
 
         # Créer les filtres
         print("Création des filtres...")
@@ -37,7 +49,7 @@ def search():
         try:
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
-            profiles = loop.run_until_complete(search_bing(query, max_pages=5))
+            profiles = loop.run_until_complete(search_bing(query, max_pages=config['max_pages']))
             loop.close()
             
             print(f"Résultat search_bing: {profiles}")
