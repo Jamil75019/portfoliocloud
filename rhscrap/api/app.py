@@ -29,8 +29,8 @@ def search():
         depth_config = {
             'quick': {'max_pages': 2, 'max_results': 5},
             'normal': {'max_pages': 5, 'max_results': 10},  
-            'deep': {'max_pages': 8, 'max_results': 20},
-            'extensive': {'max_pages': 15, 'max_results': 50}
+            'deep': {'max_pages': 6, 'max_results': 20},
+            'extensive': {'max_pages': 8, 'max_results': 50}
         }
         
         config = depth_config.get(search_depth, depth_config['normal'])
