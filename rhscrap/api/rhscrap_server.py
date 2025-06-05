@@ -192,38 +192,47 @@ async def search_bing(query: str, max_pages: int = 5) -> List[LinkedInProfile]:
                 for result in search_results:
                     try:
                         print(f"Traitement: {result['url']}")
+                        print(f"Titre: {result['title']}")
                         
                         # Vérifier si on a déjà ce profil (éviter les doublons)
                         if any(p.url == result['url'] for p in profiles):
                             print(f"Profil déjà traité, skip: {result['url']}")
                             continue
                         
-                        # Extraire le nom depuis l'URL
-                        name_from_url = result['url'].split('/in/')[-1].replace('-', ' ').title()
-                        if name_from_url.endswith('/'):
-                            name_from_url = name_from_url[:-1]
-                        
-                        # Nettoyer le nom (enlever les codes)
-                        name_clean = re.sub(r'\s+[A-Z0-9]{8,}$', '', name_from_url)
-                        
-                        # Extraire le poste et l'entreprise depuis le titre et la description Bing
-                        position, company = extract_position_company_from_bing(result['title'], result['description'])
-                        
-                        # Générer des emails avec la vraie entreprise si trouvée
-                        company_for_email = company if company != "Entreprise à déterminer" else "company"
-                        emails = generate_emails(name_clean, company_for_email)
-                        
-                        profile = LinkedInProfile(
-                            name=name_clean,
-                            position=position,
-                            company=company,
-                            description=result['description'][:200] + "..." if len(result['description']) > 200 else result['description'],
-                            url=result['url'],
-                            emails=emails
-                        )
-                        
-                        profiles.append(profile)
-                        print(f"✅ Profil ajouté: {profile.name} - {profile.position} chez {profile.company}")
+                        # ✅ NOUVELLE MÉTHODE (v2) : Extraire nom/poste depuis le titre Bing
+                        if result['title'] and 'linkedin.com/in/' in result['url']:
+                            name, position = await clean_linkedin_title(result['title'])
+                            print(f"Nom extrait du titre: '{name}', Poste: '{position}'")
+                            
+                            # Si le nom du titre est vide, essayer depuis l'URL en dernier recours
+                            if not name.strip():
+                                name = decode_url_name(result['url'])
+                                print(f"Nom depuis URL en dernier recours: '{name}'")
+                            
+                            # Skip si toujours pas de nom valide
+                            if not name.strip():
+                                print(f"❌ Pas de nom valide trouvé, skip")
+                                continue
+                            
+                            # Extraire l'entreprise depuis le titre et la description Bing
+                            company = extract_company_from_bing_text(result['title'], result['description'])
+                            print(f"Entreprise extraite: '{company}'")
+                            
+                            # Générer des emails avec la vraie entreprise si trouvée
+                            company_for_email = company if company != "Entreprise à déterminer" else "company"
+                            emails = generate_emails(name, company_for_email)
+                            
+                            profile = LinkedInProfile(
+                                name=clean_text(name),
+                                position=clean_text(position) if position else "Poste à déterminer",
+                                company=company,
+                                description=result['description'][:200] + "..." if len(result['description']) > 200 else result['description'],
+                                url=result['url'],
+                                emails=emails
+                            )
+                            
+                            profiles.append(profile)
+                            print(f"✅ Profil ajouté: {profile.name} - {profile.position} chez {profile.company}")
                         
                     except Exception as e:
                         print(f"❌ Erreur lors du traitement de {result.get('url', 'URL inconnue')}: {e}")
@@ -408,3 +417,30 @@ def decode_url_name(url: str) -> str:
     except Exception as e:
         print(f"Erreur lors du décodage du nom: {e}")
         return ""
+
+def extract_company_from_bing_text(title: str, description: str) -> str:
+    """Extrait l'entreprise depuis le titre et la description Bing"""
+    full_text = f"{title} {description}".lower()
+    
+    # Liste des entreprises françaises reconnues
+    companies = [
+        'orange', 'total', 'bnp paribas', 'société générale', 'crédit agricole',
+        'peugeot', 'renault', 'airbus', 'thales', 'capgemini', 'accenture',
+        'deloitte', 'pwc', 'kpmg', 'sncf', 'edf', 'engie', 'bouygues',
+        'vinci', 'carrefour', 'michelin', 'sanofi', 'dassault'
+    ]
+    
+    # Chercher les entreprises connues
+    for company in companies:
+        if company in full_text:
+            # Capitaliser proprement
+            return company.title()
+    
+    # Pattern générique "chez [Entreprise]"
+    chez_match = re.search(r'chez\s+([A-Z][a-zA-Z\s&]+?)(?:\s*[\-\|•]|\s*$)', title + " " + description)
+    if chez_match:
+        potential_company = chez_match.group(1).strip()
+        if len(potential_company) > 2 and len(potential_company) < 50:
+            return potential_company
+    
+    return "Entreprise à déterminer"
