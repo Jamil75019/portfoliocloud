@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RHScrap - LinkedIn Profile Finder</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Navigation moderne -->
+        <nav class="navbar">
+            <a href="/portfolio" class="nav-link">
+                <i class="fas fa-arrow-left"></i>
+                Retour au Portfolio
+            </a>
+        </nav>
+
+        <div class="rhscrap-container">
+            <!-- En-tête avec gradient -->
+            <header>
+                <h1 class="title">RHScrap Web</h1>
+                <p class="subtitle">
+                    <i class="fas fa-magic"></i>
+                    Trouvez des profils et emails professionnels en quelques clics seulement !
+                </p>
+            </header>
+
+            <!-- Interface de recherche modernisée -->
+            <div class="search-container">
+                <!-- Recherche principale -->
+                <div class="search-box">
+                    <label for="query">
+                        <i class="fab fa-linkedin"></i>
+                        Recherche LinkedIn
+                    </label>
+                    <input 
+                        type="text" 
+                        id="query" 
+                        name="query" 
+                        placeholder="Ex: RH France orange cloud"
+                        required
+                    >
+                </div>
+
+                <!-- Filtres optionnels -->
+                <div class="filters">
+                    <div class="filter-box">
+                        <label for="enterprise">
+                            <i class="fas fa-building"></i>
+                            Entreprise (optionnel)
+                        </label>
+                        <input 
+                            type="text" 
+                            id="enterprise" 
+                            name="enterprise" 
+                            placeholder="orange"
+                        >
+                    </div>
+
+                    <div class="filter-box">
+                        <label for="location">
+                            <i class="fas fa-map-marker-alt"></i>
+                            Localisation (optionnel)
+                        </label>
+                        <input 
+                            type="text" 
+                            id="location" 
+                            name="location" 
+                            placeholder="france"
+                        >
+                    </div>
+                </div>
+
+                <!-- Sélecteur de profondeur -->
+                <div class="filter-box">
+                    <label for="searchDepth">
+                        <i class="fas fa-search-plus"></i>
+                        Profondeur de recherche
+                    </label>
+                    <select id="searchDepth" name="searchDepth">
+                        <option value="quick">Recherche rapide (5 profils)</option>
+                        <option value="normal" selected>Recherche normale (10 profils)</option>
+                        <option value="deep">Recherche approfondie (20 profils)</option>
+                        <option value="extensive">Recherche extensive (30 profils)</option>
+                    </select>
+                </div>
+
+                <!-- Bouton de lancement -->
+                <button id="searchBtn" class="primary-button">
+                    <i class="fas fa-rocket"></i>
+                    Lancer la recherche
+                </button>
+            </div>
+
+            <!-- Barre de progression -->
+            <div id="progressContainer" class="progress-container hidden">
+                <div class="progress-bar">
+                    <div id="progressFill" class="progress-fill" style="width: 0%"></div>
+                </div>
+                <div id="progressText" class="progress-text">Initialisation...</div>
+            </div>
+
+            <!-- Zone de résultats -->
+            <div id="resultsContainer" class="results-container hidden">
+                <!-- Les résultats seront injectés ici -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentSearch = null;
+
+        document.getElementById('searchBtn').addEventListener('click', async function() {
+            const query = document.getElementById('query').value.trim();
+            if (!query) {
+                alert('Veuillez entrer une requête de recherche');
+                return;
+            }
+
+            const enterprise = document.getElementById('enterprise').value.trim();
+            const location = document.getElementById('location').value.trim();
+            const searchDepth = document.getElementById('searchDepth').value;
+
+            // Masquer les résultats précédents et afficher la progression
+            document.getElementById('resultsContainer').classList.add('hidden');
+            document.getElementById('progressContainer').classList.remove('hidden');
+            
+            // Désactiver le bouton
+            const searchBtn = document.getElementById('searchBtn');
+            const originalHTML = searchBtn.innerHTML;
+            searchBtn.disabled = true;
+            searchBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Recherche en cours...';
+
+            // Animation de la barre de progression
+            let progress = 0;
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+            
+            const progressMessages = [
+                'Connexion au serveur...',
+                'Initialisation de la recherche...',
+                'Scan des profils LinkedIn...',
+                'Extraction des informations...',
+                'Génération des emails...',
+                'Finalisation des résultats...'
+            ];
+
+            let messageIndex = 0;
+            const progressInterval = setInterval(() => {
+                if (progress < 90) {
+                    progress += Math.random() * 15;
+                    if (progress > 90) progress = 90;
+                    
+                    progressFill.style.width = progress + '%';
+                    
+                    if (messageIndex < progressMessages.length) {
+                        progressText.textContent = progressMessages[messageIndex];
+                        messageIndex++;
+                    }
+                }
+            }, 1000);
+
+            try {
+                const response = await fetch('/rhscrap/search', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        query: query,
+                        enterprise: enterprise || null,
+                        location: location || null,
+                        searchDepth: searchDepth
+                    })
+                });
+
+                const data = await response.json();
+
+                // Compléter la barre de progression
+                clearInterval(progressInterval);
+                progressFill.style.width = '100%';
+                progressText.textContent = 'Recherche terminée !';
+
+                setTimeout(() => {
+                    document.getElementById('progressContainer').classList.add('hidden');
+                    
+                    if (data.error) {
+                        document.getElementById('resultsContainer').innerHTML = `
+                            <div class="error-message">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <strong>Erreur:</strong> ${data.error}
+                                ${data.traceback ? `<pre style="margin-top: 10px; font-size: 0.9em;">${data.traceback}</pre>` : ''}
+                            </div>
+                        `;
+                    } else {
+                        displayResults(data);
+                    }
+                    
+                    document.getElementById('resultsContainer').classList.remove('hidden');
+                }, 1000);
+
+            } catch (error) {
+                clearInterval(progressInterval);
+                document.getElementById('progressContainer').classList.add('hidden');
+                document.getElementById('resultsContainer').innerHTML = `
+                    <div class="error-message">
+                        <i class="fas fa-wifi"></i>
+                        <strong>Erreur de connexion:</strong> ${error.message}
+                    </div>
+                `;
+                document.getElementById('resultsContainer').classList.remove('hidden');
+            } finally {
+                // Réactiver le bouton
+                searchBtn.disabled = false;
+                searchBtn.innerHTML = originalHTML;
+            }
+        });
+
+        function displayResults(data) {
+            const container = document.getElementById('resultsContainer');
+            
+            if (!data.profiles || data.profiles.length === 0) {
+                container.innerHTML = `
+                    <div class="error-message">
+                        <i class="fas fa-search"></i>
+                        <strong>Aucun résultat trouvé</strong>
+                        <p>Essayez de modifier vos critères de recherche.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = `
+                <div class="success-message">
+                    <i class="fas fa-check-circle"></i>
+                    <strong>Recherche terminée !</strong>
+                    <p>${data.count} profil${data.count > 1 ? 's' : ''} trouvé${data.count > 1 ? 's' : ''}</p>
+                </div>
+            `;
+
+            data.profiles.forEach((profile, index) => {
+                const emails = profile.emails || [];
+                const emailsList = emails.length > 0 
+                    ? emails.map(email => `<li>${email.address || email} ${email.probability ? `(${Math.round(email.probability * 100)}%)` : ''}</li>`).join('')
+                    : '<li>Aucun email généré</li>';
+
+                html += `
+                    <div class="result-card" style="animation-delay: ${index * 0.1}s">
+                        <h3><i class="fas fa-user"></i> ${profile.name || 'Nom non disponible'}</h3>
+                        <div class="position">
+                            <i class="fas fa-briefcase"></i>
+                            ${profile.position || 'Poste non spécifié'}
+                        </div>
+                        <div class="company">
+                            <i class="fas fa-building"></i>
+                            ${profile.company || 'Entreprise à déterminer'}
+                        </div>
+                        
+                        ${profile.url ? `
+                            <a href="${profile.url}" target="_blank" class="profile-link">
+                                <i class="fab fa-linkedin"></i>
+                                Voir le profil LinkedIn
+                            </a>
+                        ` : ''}
+                        
+                        <div class="emails">
+                            <h4><i class="fas fa-envelope"></i> Emails potentiels</h4>
+                            <ul>${emailsList}</ul>
+                        </div>
+                    </div>
+                `;
+            });
+
+            if (data.resultUrl) {
+                html += `
+                    <a href="${data.resultUrl}" download class="download-button">
+                        <i class="fas fa-download"></i>
+                        Télécharger les résultats (JSON)
+                    </a>
+                `;
+            }
+
+            container.innerHTML = html;
+        }
+
+        // Animation d'entrée pour les éléments
+        document.addEventListener('DOMContentLoaded', function() {
+            const elements = document.querySelectorAll('.rhscrap-container > *');
+            elements.forEach((el, index) => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(30px)';
+                
+                setTimeout(() => {
+                    el.style.transition = 'all 0.6s ease';
+                    el.style.opacity = '1';
+                    el.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        });
+
+        // Effet de parallaxe subtil
+        document.addEventListener('mousemove', function(e) {
+            const containers = document.querySelectorAll('.filter-box, .result-card');
+            const mouseX = e.clientX / window.innerWidth;
+            const mouseY = e.clientY / window.innerHeight;
+            
+            containers.forEach((container, index) => {
+                const speed = (index % 3 + 1) * 0.5;
+                const x = (mouseX - 0.5) * speed;
+                const y = (mouseY - 0.5) * speed;
+                
+                container.style.transform = `translateX(${x}px) translateY(${y}px)`;
+            });
+        });
+    </script>
+</body>
+</html> 
