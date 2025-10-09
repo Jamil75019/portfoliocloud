@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  rhscrap:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=production
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./results:/tmp/rhscrap_results
+    restart: unless-stopped
+    # Configuration pour Playwright en mode headless
+    shm_size: '2gb'
+    # Variables d'environnement pour éviter les problèmes de permissions
+    environment:
+      - DISPLAY=:99
+      - PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+    # Configuration pour le mode headless de Playwright
+    command: >
+      sh -c "
+        Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+        python api/app.py
+      " 
