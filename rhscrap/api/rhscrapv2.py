@@ -7,6 +7,7 @@ from typing import List, Dict, Tuple, Optional
 import sys
 import csv
 import json
+import urllib.parse
 from datetime import datetime
 from tqdm import tqdm
 import time
@@ -433,6 +434,68 @@ def save_results(profiles: List[LinkedInProfile], query: str, custom_path=None):
     print(f"\n💾 Résultats sauvegardés dans : {txt_filename}")
     return txt_filename
 
+def is_plausible_full_name(name: str) -> bool:
+    """Vérifie si la chaîne ressemble à un nom prénom exploitable."""
+    if not name:
+        return False
+    name = name.strip()
+    if any(ch.isdigit() for ch in name) or '@' in name:
+        return False
+    lower = name.lower()
+    for k in ['talent', 'acquisition', 'recruit', 'recruteur', 'recrutement', 'hr', 'hrbp',
+              'manager', 'head', 'lead', 'leader', 'director', 'directeur', 'directrice',
+              'responsable', 'consultant', 'consultante', 'partner', 'owner', 'founder',
+              'freelance', 'alternant', 'stagiaire', 'assistant', 'assistante', 'intern',
+              'coach', 'sourcing', 'chargé', 'chargée', 'specialist', 'spécialiste',
+              'développeur', 'engineer', 'ingénieur', 'product', 'marketing', 'sales',
+              'cloud', 'data', 'avocat', 'juriste']:
+        if k in lower:
+            return False
+    tokens = [t for t in re.split(r"\s+", name) if t]
+    if len(tokens) < 2:
+        return False
+    first, last = tokens[0], tokens[-1]
+    if last.endswith('.') or len(last.strip('.')) < 2:
+        return False
+    if len(first.strip('.')) < 2:
+        return False
+    if not first[0].isalpha() or not last[0].isalpha():
+        return False
+    return True
+
+def find_name_in_text(text: str) -> Optional[str]:
+    if not text:
+        return None
+    base = text.replace(' | LinkedIn', '').replace(' - LinkedIn', '')
+    pattern = re.compile(r"\b([A-Z][A-Za-zÀ-ÖØ-öø-ÿ'\-]+)\s+(?:([a-zà-öø-ÿ'\-]+)\s+)?([A-Z][A-Za-zÀ-ÖØ-öø-ÿ'\-]{2,})\b")
+    for m in pattern.finditer(base):
+        first = m.group(1)
+        middle = (m.group(2) or '')
+        last = m.group(3)
+        candidate = f"{first} {last}"
+        if is_plausible_full_name(candidate):
+            return candidate
+    return None
+
+def extract_name_from_linkedin_url(href: Optional[str]) -> Optional[str]:
+    try:
+        if not href or 'linkedin.com/in/' not in href:
+            return None
+        slug = href.split('/in/', 1)[1].strip('/')
+        slug = slug.split('/')[0]
+        slug_decoded = urllib.parse.unquote(slug)
+        cleaned = re.sub(r"[^A-Za-zÀ-ÖØ-öø-ÿ\-\s]", ' ', slug_decoded)
+        parts = [p for p in re.split(r"[\-\s]+", cleaned) if p]
+        if len(parts) >= 2:
+            first, last = parts[0], parts[1]
+            if len(last) >= 2 and len(first) >= 2:
+                candidate = f"{first.title()} {last.title()}"
+                if is_plausible_full_name(candidate):
+                    return candidate
+        return None
+    except Exception:
+        return None
+
 async def search_bing(query: str, max_pages: int = 5, queue: queue.Queue = None) -> List[LinkedInProfile]:
     """Recherche des profils LinkedIn sur plusieurs pages de résultats Bing."""
     results = []
@@ -451,7 +514,7 @@ async def search_bing(query: str, max_pages: int = 5, queue: queue.Queue = None)
         async with async_playwright() as p:
             debug_log("Lancement du navigateur...")
             browser = await p.chromium.launch(
-                headless=True,
+                headless=False,  # Mode visible pour debug
                 args=['--no-sandbox', '--disable-setuid-sandbox']
             )
             
@@ -464,6 +527,8 @@ async def search_bing(query: str, max_pages: int = 5, queue: queue.Queue = None)
             debug_log("Création de la page...")
             page = await context.new_page()
             total_results = 0
+            # Déduplication inter-pages
+            seen_urls: set = set()
             
             for current_page in range(max_pages):
                 if not queue:  # Si la queue est None, le scraping a été arrêté
@@ -473,9 +538,9 @@ async def search_bing(query: str, max_pages: int = 5, queue: queue.Queue = None)
                 debug_log(f"Analyse de la page {current_page + 1}...")
                 
                 try:
-                    # Construction de l'URL avec pagination
-                    first_result = current_page * 10 + 1
-                    url = f"https://www.bing.com/search?q={query.replace(' ', '+')}&first={first_result}"
+                    # Pagination DuckDuckGo: paramètre s = offset (par blocs ~30)
+                    offset = current_page * 30
+                    url = f"https://duckduckgo.com/?q={query.replace(' ', '+')}+&ia=web&s={offset}"
                     debug_log(f"URL de recherche : {url}")
                     
                     # Navigation avec retries
@@ -487,6 +552,28 @@ async def search_bing(query: str, max_pages: int = 5, queue: queue.Queue = None)
                             debug_log(f"Tentative de navigation {attempt + 1}/{max_retries}...")
                             await page.goto(url, timeout=30000)  # 30 secondes de timeout
                             await page.wait_for_load_state('networkidle', timeout=30000)
+                            
+                            # Vérifier et gérer le CAPTCHA
+                            try:
+                                # Attendre que la vérification initiale se termine
+                                debug_log("Attente de la vérification Bing...")
+                                await asyncio.sleep(6)  # Attendre 6 secondes pour la vérification
+                                
+                                # Chercher le CAPTCHA avec le bon sélecteur
+                                captcha_checkbox = await page.query_selector('label.cb-lb input[type="checkbox"]')
+                                if captcha_checkbox:
+                                    debug_log("CAPTCHA détecté, tentative de résolution automatique...")
+                                    await captcha_checkbox.click()
+                                    await asyncio.sleep(3)  # Attendre que le CAPTCHA se valide
+                                    debug_log("CAPTCHA résolu automatiquement")
+                                    
+                                    # Attendre que la page se recharge
+                                    await page.wait_for_load_state('networkidle', timeout=30000)
+                                else:
+                                    debug_log("Aucun CAPTCHA détecté, continuation normale")
+                            except Exception as captcha_error:
+                                debug_log(f"Erreur lors de la résolution du CAPTCHA: {captcha_error}")
+                            
                             success = True
                             debug_log("Navigation réussie")
                             break
@@ -506,41 +593,70 @@ async def search_bing(query: str, max_pages: int = 5, queue: queue.Queue = None)
                         await page.evaluate(f'window.scrollTo(0, {(scroll + 1) * 1000})')
                         await asyncio.sleep(0.5)
                     
-                    # Récupération des résultats
+                    # Récupération DIRECTE des liens LinkedIn sur DuckDuckGo
                     debug_log("Recherche des résultats...")
-                    elements = await page.query_selector_all('.b_algo')
-                    
-                    if not elements:
-                        debug_log("Aucun résultat trouvé sur cette page")
+                    links = await page.query_selector_all('a[data-testid="result-title-a"][href*="linkedin.com/in/"]')
+                    debug_log(f"Liens LinkedIn trouvés : {len(links)}")
+
+                    if not links:
+                        debug_log("Aucun résultat LinkedIn trouvé sur cette page")
                         break
-                    
-                    debug_log(f"Nombre de résultats trouvés : {len(elements)}")
-                    total_results += len(elements)
-                    
-                    # Traitement des résultats
-                    for i, el in enumerate(elements, 1):
+
+                    total_results += len(links)
+
+                    for i, link in enumerate(links, 1):
                         try:
-                            title_el = await el.query_selector('h2 a, h3 a')
-                            if not title_el:
+                            title = (await link.text_content()) or ""
+                            href = await link.get_attribute('href')
+                            # Déduplication
+                            if not href or href in seen_urls:
                                 continue
-                            
-                            title = await title_el.text_content()
-                            href = await title_el.get_attribute('href')
-                            
+
+                            # Essayer de récupérer un snippet proche
                             description = ""
-                            meta_el = await el.query_selector('.b_caption p, .VwiC3b')
-                            if meta_el:
-                                description = await meta_el.text_content()
-                            
+                            try:
+                                container_handle = await link.evaluate_handle('el => el.closest(".result, .web-result")')
+                                if container_handle:
+                                    snippet_el = await container_handle.query_selector('.result__snippet, .result__body')
+                                    if snippet_el:
+                                        description = await snippet_el.text_content()
+                            except Exception:
+                                pass
+
                             if href and "linkedin.com/in/" in href:
                                 debug_log(f"Traitement du profil : {title}")
                                 name, position = await clean_linkedin_title(title)
-                                if name.strip():
+                                # Renforcer l'extraction du nom
+                                candidate_name = (name or "").strip()
+                                if not is_plausible_full_name(candidate_name):
+                                    alt = find_name_in_text(title)
+                                    if alt and is_plausible_full_name(alt):
+                                        candidate_name = alt
+                                    else:
+                                        alt2 = extract_name_from_linkedin_url(href)
+                                        if alt2 and is_plausible_full_name(alt2):
+                                            candidate_name = alt2
+                                if is_plausible_full_name(candidate_name):
                                     company, domain = extract_company_info(position, description)
-                                    emails = generate_possible_emails(name, domain, company)
-                                    
+
+                                    # Mapping simple entreprise -> domaine
+                                    text_all = f"{title} {position} {description}".lower()
+                                    company_lower = (company or "").lower()
+                                    known_domains = {
+                                        'orange': ('Orange', 'orange.com'),
+                                        'thales': ('Thales', 'thales.com'),
+                                        'thalesgroup': ('Thales', 'thalesgroup.com'),
+                                    }
+                                    for key, (label, dom) in known_domains.items():
+                                        if key in text_all or key in company_lower:
+                                            company = label
+                                            domain = dom
+                                            break
+
+                                    emails = generate_possible_emails(candidate_name, domain, company)
+
                                     profile = LinkedInProfile(
-                                        name=clean_text(name),
+                                        name=clean_text(candidate_name),
                                         position=clean_text(position),
                                         company=company,
                                         description=clean_text(description),
@@ -548,16 +664,16 @@ async def search_bing(query: str, max_pages: int = 5, queue: queue.Queue = None)
                                         emails=emails
                                     )
                                     results.append(profile)
+                                    seen_urls.add(href)
                                     debug_log(f"Profil ajouté : {name}")
-                                    
+
                                     if queue:
                                         queue.put(("progress", (current_page * 10 + i) / (max_pages * 10)))
-                            
-                            # Petit délai aléatoire entre les traitements
+
                             await asyncio.sleep(random.uniform(0.1, 0.3))
-                            
+
                         except Exception as e:
-                            debug_log(f"Erreur lors du traitement d'un résultat : {str(e)}")
+                            debug_log(f"Erreur lors du traitement d'un lien : {str(e)}")
                             continue
                     
                     # Délai entre les pages pour éviter la détection
