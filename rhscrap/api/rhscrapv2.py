@@ -36,13 +36,13 @@ APP_VERSION = "2.0.0"
 
 # Constantes pour les tooltips
 TOOLTIPS = {
-    "search": "Entrez vos mots-clÃ©s de recherche (poste, entreprise, localisation...)",
-    "enterprise_filter": "Filtrer les rÃ©sultats pour une entreprise spÃ©cifique",
-    "location_filter": "Filtrer les rÃ©sultats par rÃ©gion ou ville",
-    "pages": "Nombre de pages de rÃ©sultats Ã  analyser (plus de pages = plus de rÃ©sultats mais plus long)",
-    "verify_emails": "VÃ©rifie la validitÃ© des emails via DNS et SMTP (recommandÃ© mais plus lent)",
-    "start": "Lancer la recherche avec les paramÃ¨tres configurÃ©s",
-    "stop": "ArrÃªter la recherche en cours",
+    "search": "Entrez vos mots-clés de recherche (poste, entreprise, localisation...)",
+    "enterprise_filter": "Filtrer les résultats pour une entreprise spécifique",
+    "location_filter": "Filtrer les résultats par région ou ville",
+    "pages": "Nombre de pages de résultats à analyser (plus de pages = plus de résultats mais plus long)",
+    "verify_emails": "Vérifie la validité des emails via DNS et SMTP (recommandé mais plus lent)",
+    "start": "Lancer la recherche avec les paramètres configurés",
+    "stop": "Arrêter la recherche en cours",
     "help": "Afficher l'aide et la documentation"
 }
 
@@ -51,25 +51,25 @@ HELP_TEXT = """
 ðŸ” LinkedIn Profile Scraper - Guide d'utilisation
 
 1. Recherche
-   - Entrez vos mots-clÃ©s (poste, entreprise, localisation)
+   - Entrez vos mots-clés (poste, entreprise, localisation)
    - Exemple : "RH France Orange" ou "Recruteur Paris"
 
 2. Filtres
-   - Entreprise : Limite les rÃ©sultats Ã  une entreprise spÃ©cifique
-   - Localisation : Filtre par rÃ©gion ou ville en France
+   - Entreprise : Limite les résultats à une entreprise spécifique
+   - Localisation : Filtre par région ou ville en France
 
 3. Options
-   - Pages : Plus de pages = plus de rÃ©sultats mais plus long
-   - VÃ©rification emails : Validation technique des emails trouvÃ©s
+   - Pages : Plus de pages = plus de résultats mais plus long
+   - Vérification emails : Validation technique des emails trouvés
 
-4. RÃ©sultats
-   - SauvegardÃ©s automatiquement dans le dossier 'resultatsv2'
+4. Résultats
+   - Sauvegardés automatiquement dans le dossier 'resultatsv2'
    - Format : TXT avec horodatage
 
 5. Conseils
    - Commencez par une recherche large puis affinez
-   - La vÃ©rification d'emails peut ralentir le processus
-   - Utilisez les filtres pour des rÃ©sultats plus prÃ©cis
+   - La vérification d'emails peut ralentir le processus
+   - Utilisez les filtres pour des résultats plus précis
 
 Pour plus d'informations ou support :
 support@linkedinscraper.pro
@@ -88,7 +88,7 @@ class LinkedInProfile:
     company: str
     description: str
     url: str
-    emails: List[Tuple[str, float]]  # (email, probabilitÃ©)
+    emails: List[Tuple[str, float]]  # (email, probabilité)
 
     def to_dict(self):
         return {
@@ -147,10 +147,10 @@ class SearchHistory:
         self.load_history()
     
     def add_search(self, item: SearchHistoryItem):
-        # Ajouter la recherche en tÃªte de liste
+        # Ajouter la recherche en tête de liste
         self.items.insert(0, item)
         
-        # Limiter le nombre d'Ã©lÃ©ments dans l'historique
+        # Limiter le nombre d'éléments dans l'historique
         if len(self.items) > self.max_items:
             self.items = self.items[:self.max_items]
             
@@ -159,10 +159,10 @@ class SearchHistory:
     
     def load_history(self):
         try:
-            # CrÃ©er le rÃ©pertoire resultatsv2 s'il n'existe pas
+            # Créer le répertoire resultatsv2 s'il n'existe pas
             os.makedirs("resultatsv2", exist_ok=True)
             
-            # VÃ©rifier si le fichier existe
+            # Vérifier si le fichier existe
             if os.path.exists(self.history_file):
                 with open(self.history_file, 'r', encoding='utf-8') as f:
                     data = json.load(f)
@@ -187,16 +187,16 @@ class SearchHistory:
         self.save_history()
 
 def clean_text(text: str) -> str:
-    # Nettoie le texte des caractÃ¨res spÃ©ciaux et des espaces multiples
+    # Nettoie le texte des caractères spéciaux et des espaces multiples
     text = re.sub(r'\s+', ' ', text)
     return text.strip()
 
 def extract_company_info(position: str, description: str) -> tuple:
-    # Base de donnÃ©es enrichie des entreprises et leurs domaines
+    # Base de données enrichie des entreprises et leurs domaines
     company_domains = {
-        # Grandes entreprises franÃ§aises
+        # Grandes entreprises françaises
         "Orange": ("Orange", "orange.com"),
-        "SociÃ©tÃ© GÃ©nÃ©rale": ("SociÃ©tÃ© GÃ©nÃ©rale", "socgen.com"),
+        "Société Générale": ("Société Générale", "socgen.com"),
         "BNP Paribas": ("BNP Paribas", "bnpparibas.com"),
         "Total": ("TotalEnergies", "totalenergies.com"),
         "Carrefour": ("Carrefour", "carrefour.com"),
@@ -243,10 +243,10 @@ def extract_company_info(position: str, description: str) -> tuple:
     
     text = f"{position} {description}".lower()
     
-    # Patterns amÃ©liorÃ©s pour trouver l'entreprise
+    # Patterns améliorés pour trouver l'entreprise
     patterns = [
         r'(?:chez|at|-)\s+([A-Za-z][A-Za-z\s&\.]+?)(?:\s|$)',
-        r'(?:[@]|[Ã ])\s+([A-Za-z][A-Za-z\s&\.]+?)(?:\s|$)',
+        r'(?:[@]|[à])\s+([A-Za-z][A-Za-z\s&\.]+?)(?:\s|$)',
         r'(?:pour|for)\s+([A-Za-z][A-Za-z\s&\.]+?)(?:\s|$)',
         r'(?:^|\s)([A-Za-z][A-Za-z\s&\.]+?)\s+(?:group|groupe|sa|sas|inc|corp|corporation)(?:\s|$)',
         r'(?:^|\s)([A-Za-z][A-Za-z\s&\.]+?)\s+(?:france|europe|asia|americas)(?:\s|$)'
@@ -272,18 +272,18 @@ def extract_company_info(position: str, description: str) -> tuple:
     return "Entreprise inconnue", "unknown-company.com"
 
 def get_email_formats_for_company(company_name: str) -> List[EmailFormat]:
-    """Retourne les formats d'emails probables pour une entreprise donnÃ©e."""
+    """Retourne les formats d'emails probables pour une entreprise donnée."""
     
-    # Formats par dÃ©faut avec leurs probabilitÃ©s
+    # Formats par défaut avec leurs probabilités
     default_formats = [
         EmailFormat("{prenom}.{nom}", 0.7, "Format standard international"),
         EmailFormat("{prenom[0]}{nom}", 0.4, "Format court"),
-        EmailFormat("{nom}.{prenom}", 0.3, "Format inversÃ©"),
-        EmailFormat("{prenom}{nom}", 0.2, "Format sans sÃ©parateur"),
+        EmailFormat("{nom}.{prenom}", 0.3, "Format inversé"),
+        EmailFormat("{prenom}{nom}", 0.2, "Format sans séparateur"),
         EmailFormat("{prenom}-{nom}", 0.1, "Format avec tiret")
     ]
     
-    # Formats spÃ©cifiques par entreprise
+    # Formats spécifiques par entreprise
     company_specific_formats = {
         "Orange": [
             EmailFormat("{prenom}.{nom}", 0.9, "Format standard Orange"),
@@ -298,7 +298,7 @@ def get_email_formats_for_company(company_name: str) -> List[EmailFormat]:
         "Google": [
             EmailFormat("{prenom}{nom}", 0.9, "Format Google standard"),
             EmailFormat("{prenom}.{nom}", 0.5, "Format alternatif Google"),
-            EmailFormat("{prenom}", 0.3, "Format prÃ©nom uniquement")
+            EmailFormat("{prenom}", 0.3, "Format prénom uniquement")
         ],
         "Microsoft": [
             EmailFormat("{prenom}.{nom}", 0.9, "Format standard Microsoft"),
@@ -311,9 +311,9 @@ def get_email_formats_for_company(company_name: str) -> List[EmailFormat]:
         ],
         "Meta": [
             EmailFormat("{prenom}.{nom}", 0.9, "Format Meta standard"),
-            EmailFormat("{prenom}", 0.5, "Format prÃ©nom uniquement Meta")
+            EmailFormat("{prenom}", 0.5, "Format prénom uniquement Meta")
         ],
-        "SociÃ©tÃ© GÃ©nÃ©rale": [
+        "Société Générale": [
             EmailFormat("{prenom}.{nom}", 0.9, "Format SG standard"),
             EmailFormat("{prenom[0]}.{nom}", 0.5, "Format court SG")
         ],
@@ -326,11 +326,11 @@ def get_email_formats_for_company(company_name: str) -> List[EmailFormat]:
     return company_specific_formats.get(company_name, default_formats)
 
 def generate_possible_emails(nom: str, domaine: str, company: str) -> List[Tuple[str, float]]:
-    """GÃ©nÃ¨re les emails possibles avec leurs probabilitÃ©s."""
+    """Génère les emails possibles avec leurs probabilités."""
     # Nettoyage du nom
     nom = nom.lower()
     nom = re.sub(r'[Ã©Ã¨ÃªÃ«áº½]', 'e', nom)
-    nom = re.sub(r'[Ã Ã¢Ã¤Ã£Ã¥]', 'a', nom)
+    nom = re.sub(r'[àÃ¢Ã¤Ã£Ã¥]', 'a', nom)
     nom = re.sub(r'[Ã¯Ã®Ã¬Ã­]', 'i', nom)
     nom = re.sub(r'[Ã´Ã¶Ã²Ã³]', 'o', nom)
     nom = re.sub(r'[Ã¹Ã»Ã¼Ãº]', 'u', nom)
@@ -346,7 +346,7 @@ def generate_possible_emails(nom: str, domaine: str, company: str) -> List[Tuple
         # Obtenir les formats d'emails pour cette entreprise
         email_formats = get_email_formats_for_company(company)
         
-        # GÃ©nÃ©rer les emails avec leurs probabilitÃ©s
+        # Générer les emails avec leurs probabilités
         emails_with_prob = []
         for fmt in email_formats:
             email = fmt.pattern.format(
@@ -358,7 +358,7 @@ def generate_possible_emails(nom: str, domaine: str, company: str) -> List[Tuple
             email = f"{email}@{domaine}"
             emails_with_prob.append((email, fmt.probability))
         
-        # Trier par probabilitÃ© dÃ©croissante
+        # Trier par probabilité décroissante
         return sorted(emails_with_prob, key=lambda x: x[1], reverse=True)
     
     return []
@@ -376,14 +376,14 @@ async def clean_linkedin_title(title: str) -> tuple:
     return title.strip(), ""
 
 def clean_filename(query: str) -> str:
-    """Nettoie la requÃªte pour en faire un nom de fichier valide."""
-    # Remplacer les caractÃ¨res non autorisÃ©s par des underscores
+    """Nettoie la requête pour en faire un nom de fichier valide."""
+    # Remplacer les caractères non autorisés par des underscores
     filename = re.sub(r'[\\/*?:"<>|]', '_', query)
     # Remplacer les espaces par des tirets
     filename = filename.replace(' ', '-')
-    # Enlever les caractÃ¨res accentuÃ©s
+    # Enlever les caractères accentués
     filename = re.sub(r'[Ã©Ã¨ÃªÃ«]', 'e', filename)
-    filename = re.sub(r'[Ã Ã¢Ã¤]', 'a', filename)
+    filename = re.sub(r'[àÃ¢Ã¤]', 'a', filename)
     filename = re.sub(r'[Ã¯Ã®]', 'i', filename)
     filename = re.sub(r'[Ã´Ã¶]', 'o', filename)
     filename = re.sub(r'[Ã¹Ã»Ã¼]', 'u', filename)
@@ -392,31 +392,31 @@ def clean_filename(query: str) -> str:
     return filename.lower()
 
 def save_results(profiles: List[LinkedInProfile], query: str, custom_path=None):
-    """Sauvegarde les rÃ©sultats en TXT.
+    """Sauvegarde les résultats en TXT.
     
     Args:
         profiles: Liste des profils LinkedIn
         query: RequÃªte de recherche
-        custom_path: Chemin personnalisÃ© pour l'enregistrement (optionnel)
+        custom_path: Chemin personnalisé pour l'enregistrement (optionnel)
     """
-    # CrÃ©er un nom de fichier basÃ© sur la requÃªte
+    # Créer un nom de fichier basé sur la requête
     clean_query = clean_filename(query)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     
     if custom_path:
-        # Utiliser le chemin personnalisÃ©
+        # Utiliser le chemin personnalisé
         txt_filename = os.path.join(custom_path, f"{clean_query}_{timestamp}.txt")
-        # S'assurer que le rÃ©pertoire existe (pas besoin d'utiliser dirname ici)
+        # S'assurer que le répertoire existe (pas besoin d'utiliser dirname ici)
         os.makedirs(custom_path, exist_ok=True)
     else:
-        # CrÃ©er le rÃ©pertoire par dÃ©faut s'il n'existe pas
+        # Créer le répertoire par défaut s'il n'existe pas
         os.makedirs("resultatsv2", exist_ok=True)
         txt_filename = os.path.join("resultatsv2", f"{clean_query}_{timestamp}.txt")
     
     with open(txt_filename, 'w', encoding='utf-8') as f:
-        f.write(f"RÃ©sultats de recherche LinkedIn pour : {query}\n")
+        f.write(f"Résultats de recherche LinkedIn pour : {query}\n")
         f.write(f"Date de recherche : {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}\n")
-        f.write(f"Nombre de profils trouvÃ©s : {len(profiles)}\n\n")
+        f.write(f"Nombre de profils trouvés : {len(profiles)}\n\n")
         
         for profile in profiles:
             f.write(f"ðŸ‘¤ {profile.name}\n")
@@ -426,16 +426,16 @@ def save_results(profiles: List[LinkedInProfile], query: str, custom_path=None):
                 f.write(f"ðŸ¢ Entreprise : {profile.company}\n")
             f.write(f"ðŸ”— {profile.url}\n")
             if profile.emails:
-                f.write("ðŸ“§ Emails professionnels par probabilitÃ© :\n")
+                f.write("ðŸ“§ Emails professionnels par probabilité :\n")
                 for email, prob in profile.emails[:3]:
-                    f.write(f"   âž” {email} ({prob:.0%} de probabilitÃ©)\n")
+                    f.write(f"   âž” {email} ({prob:.0%} de probabilité)\n")
             f.write("\n" + "-"*50 + "\n\n")
     
-    print(f"\nðŸ’¾ RÃ©sultats sauvegardÃ©s dans : {txt_filename}")
+    print(f"\nðŸ’¾ Résultats sauvegardés dans : {txt_filename}")
     return txt_filename
 
 def is_plausible_full_name(name: str) -> bool:
-    """VÃ©rifie si la chaÃ®ne ressemble Ã  un nom prÃ©nom exploitable."""
+    """Vérifie si la chaîne ressemble à un nom prénom exploitable."""
     if not name:
         return False
     name = name.strip()
@@ -446,8 +446,8 @@ def is_plausible_full_name(name: str) -> bool:
               'manager', 'head', 'lead', 'leader', 'director', 'directeur', 'directrice',
               'responsable', 'consultant', 'consultante', 'partner', 'owner', 'founder',
               'freelance', 'alternant', 'stagiaire', 'assistant', 'assistante', 'intern',
-              'coach', 'sourcing', 'chargÃ©', 'chargÃ©e', 'specialist', 'spÃ©cialiste',
-              'dÃ©veloppeur', 'engineer', 'ingÃ©nieur', 'product', 'marketing', 'sales',
+              'coach', 'sourcing', 'chargé', 'chargée', 'specialist', 'spécialiste',
+              'développeur', 'engineer', 'ingénieur', 'product', 'marketing', 'sales',
               'cloud', 'data', 'avocat', 'juriste']:
         if k in lower:
             return False
@@ -467,7 +467,7 @@ def find_name_in_text(text: str) -> Optional[str]:
     if not text:
         return None
     base = text.replace(' | LinkedIn', '').replace(' - LinkedIn', '')
-    pattern = re.compile(r"\b([A-Z][A-Za-zÃ€-Ã–Ã˜-Ã¶Ã¸-Ã¿'\-]+)\s+(?:([a-zÃ -Ã¶Ã¸-Ã¿'\-]+)\s+)?([A-Z][A-Za-zÃ€-Ã–Ã˜-Ã¶Ã¸-Ã¿'\-]{2,})\b")
+    pattern = re.compile(r"\b([A-Z][A-Za-zÃ€-Ã–Ã˜-Ã¶Ã¸-Ã¿'\-]+)\s+(?:([a-zà-Ã¶Ã¸-Ã¿'\-]+)\s+)?([A-Z][A-Za-zÃ€-Ã–Ã˜-Ã¶Ã¸-Ã¿'\-]{2,})\b")
     for m in pattern.finditer(base):
         first = m.group(1)
         middle = (m.group(2) or '')
@@ -497,13 +497,13 @@ def extract_name_from_linkedin_url(href: Optional[str]) -> Optional[str]:
         return None
 
 async def search_bing(query: str, max_pages: int = 5, queue: queue.Queue = None) -> List[LinkedInProfile]:
-    """Recherche des profils LinkedIn sur plusieurs pages de rÃ©sultats Bing."""
+    """Recherche des profils LinkedIn sur plusieurs pages de résultats Bing."""
     results = []
     
     def debug_log(message):
         # Ne plus afficher dans la console
         if queue:
-            # Envoyer directement Ã  la queue pour l'affichage dans l'interface
+            # Envoyer directement à la queue pour l'affichage dans l'interface
             try:
                 queue.put(("log", message))
             except Exception as e:
@@ -553,11 +553,11 @@ async def search_bing(query: str, max_pages: int = 5, queue: queue.Queue = None)
                             await page.goto(url, timeout=30000)  # 30 secondes de timeout
                             await page.wait_for_load_state('networkidle', timeout=30000)
                             
-                            # VÃ©rifier et gÃ©rer le CAPTCHA
+                            # Vérifier et gÃ©rer le CAPTCHA
                             try:
-                                # Attendre que la vÃ©rification initiale se termine
-                                debug_log("Attente de la vÃ©rification Bing...")
-                                await asyncio.sleep(6)  # Attendre 6 secondes pour la vÃ©rification
+                                # Attendre que la vérification initiale se termine
+                                debug_log("Attente de la vérification Bing...")
+                                await asyncio.sleep(6)  # Attendre 6 secondes pour la vérification
                                 
                                 # Chercher le CAPTCHA avec le bon sÃ©lecteur
                                 captcha_checkbox = await page.query_selector('label.cb-lb input[type="checkbox"]')
@@ -594,9 +594,9 @@ async def search_bing(query: str, max_pages: int = 5, queue: queue.Queue = None)
                         await asyncio.sleep(0.5)
                     
                     # RÃ©cupÃ©ration DIRECTE des liens LinkedIn sur DuckDuckGo
-                    debug_log("Recherche des rÃ©sultats...")
+                    debug_log("Recherche des résultats...")
                     links = await page.query_selector_all('a[data-testid="result-title-a"][href*="linkedin.com/in/"]')
-                    debug_log(f"Liens LinkedIn trouvÃ©s : {len(links)}")
+                    debug_log(f"Liens LinkedIn trouvés : {len(links)}")
 
                     if not links:
                         debug_log("Aucun rÃ©sultat LinkedIn trouvÃ© sur cette page")
@@ -683,7 +683,7 @@ async def search_bing(query: str, max_pages: int = 5, queue: queue.Queue = None)
                     debug_log(f"Erreur lors de l'analyse de la page {current_page + 1} : {str(e)}")
                     continue
             
-            debug_log(f"Total des rÃ©sultats analysÃ©s : {total_results}")
+            debug_log(f"Total des résultats analysés : {total_results}")
             await browser.close()
             debug_log("Navigateur fermÃ©")
             
@@ -695,7 +695,7 @@ async def search_bing(query: str, max_pages: int = 5, queue: queue.Queue = None)
     return results
 
 def ask_yes_no(question: str) -> bool:
-    """Demande une rÃ©ponse oui/non Ã  l'utilisateur."""
+    """Demande une rÃ©ponse oui/non à l'utilisateur."""
     while True:
         reponse = input(f"{question} (o/n) âž¤ ").lower().strip()
         if reponse in ['o', 'oui', 'y', 'yes']:
@@ -705,20 +705,20 @@ def ask_yes_no(question: str) -> bool:
         print("âŒ Veuillez rÃ©pondre par 'o' ou 'n'")
 
 def get_search_filters() -> SearchFilters:
-    """Demande les filtres de recherche Ã  l'utilisateur."""
+    """Demande les filtres de recherche à l'utilisateur."""
     filters = SearchFilters()
     
     # Filtre par entreprise
-    if ask_yes_no("\nðŸ¢ Voulez-vous filtrer par entreprise spÃ©cifique ?"):
+    if ask_yes_no("\nðŸ¢ Voulez-vous filtrer par entreprise spécifique ?"):
         filters.entreprise = input("Nom de l'entreprise âž¤ ").strip()
-        print(f"âœ… Les rÃ©sultats seront filtrÃ©s pour l'entreprise : {filters.entreprise}")
+        print(f"âœ… Les résultats seront filtrés pour l'entreprise : {filters.entreprise}")
     
     # Filtre par localisation
     if ask_yes_no("\nðŸ“ Voulez-vous filtrer par localisation ?"):
         print("\nChoisissez une zone gÃ©ographique :")
         print("1. France")
-        print("2. RÃ©gion spÃ©cifique")
-        print("3. Ville spÃ©cifique")
+        print("2. RÃ©gion spécifique")
+        print("3. Ville spécifique")
         while True:
             try:
                 choix = int(input("\nVotre choix (1-3) âž¤ "))
@@ -737,7 +737,7 @@ def get_search_filters() -> SearchFilters:
                         print(f"{i}. {region}")
                     while True:
                         try:
-                            choix_region = int(input("\nChoisissez une rÃ©gion (1-13) âž¤ "))
+                            choix_region = int(input("\nChoisissez une région (1-13) âž¤ "))
                             if 1 <= choix_region <= len(regions):
                                 filters.localisation = regions[choix_region-1]
                                 break
@@ -755,7 +755,7 @@ def get_search_filters() -> SearchFilters:
     return filters
 
 def filter_profile(profile: LinkedInProfile, filters: SearchFilters) -> bool:
-    """VÃ©rifie si un profil correspond aux filtres."""
+    """Vérifie si un profil correspond aux filtres."""
     # Filtre par entreprise (plus tolÃ©rant: cherche aussi dans la description)
     if filters.entreprise:
         ent = filters.entreprise.lower()
@@ -788,7 +788,7 @@ class LinkedInScraperGUI(ctk.CTk):
         self.geometry("1000x800")
         self.minsize(800, 600)
         
-        # DÃ©marrer en plein Ã©cran
+        # Démarrer en plein Ã©cran
         self.after(100, lambda: self.state('zoomed'))  # Mode plein Ã©cran (avec bordures de fenÃªtre)
         
         # Variables
@@ -821,14 +821,14 @@ class LinkedInScraperGUI(ctk.CTk):
         # Affichage du message de bienvenue
         self.show_welcome_message()
         
-        # DÃ©marrer le thread de mise Ã  jour de l'interface
+        # Démarrer le thread de mise à jour de l'interface
         self.check_queue()
 
     def check_queue(self):
-        """VÃ©rifie la queue pour les mises Ã  jour de l'interface"""
+        """Vérifie la queue pour les mises à jour de l'interface"""
         try:
             items_processed = 0
-            # Traiter jusqu'Ã  10 Ã©lÃ©ments Ã  la fois pour Ã©viter de bloquer l'interface
+            # Traiter jusqu'à 10 éléments à la fois pour Ã©viter de bloquer l'interface
             while not self.queue.empty() and items_processed < 10:
                 action, data = self.queue.get_nowait()
                 
@@ -846,19 +846,19 @@ class LinkedInScraperGUI(ctk.CTk):
                 self.queue.task_done()
                 items_processed += 1
                 
-            # Mise Ã  jour forcÃ©e de l'interface
+            # Mise à jour forcÃ©e de l'interface
             self.update_idletasks()
             
         except Exception as e:
             print(f"Error in check_queue: {str(e)}")  # Debug log
         
-        # Planifier la prochaine vÃ©rification
+        # Planifier la prochaine vérification
         self.after(100, self.check_queue)
 
     def scraping_thread(self, query, filters, nb_pages):
         """Thread sÃ©parÃ© pour le scraping"""
         try:
-            # CrÃ©er une nouvelle boucle asyncio pour ce thread
+            # Créer une nouvelle boucle asyncio pour ce thread
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
             
@@ -906,22 +906,22 @@ class LinkedInScraperGUI(ctk.CTk):
             self.queue.put(("error", f"Erreur lors du dÃ©marrage: {str(e)}"))
 
     def ask_for_export_location(self):
-        """Demande Ã  l'utilisateur oÃ¹ exporter les rÃ©sultats."""
+        """Demande à l'utilisateur où exporter les résultats."""
         from tkinter import filedialog
         
-        # Demander le rÃ©pertoire de destination
+        # Demander le répertoire de destination
         export_dir = filedialog.askdirectory(
             title="Choisir un dossier pour l'exportation",
             initialdir=os.path.join(os.getcwd(), "resultatsv2")
         )
         
         if export_dir:
-            self.queue.put(("log", f"\nðŸ’¾ RÃ©sultats seront exportÃ©s vers : {export_dir}"))
+            self.queue.put(("log", f"\nðŸ’¾ Résultats seront exportÃ©s vers : {export_dir}"))
             return export_dir
         else:
-            # Si l'utilisateur annule, utiliser le dossier par dÃ©faut
+            # Si l'utilisateur annule, utiliser le dossier par défaut
             default_dir = os.path.join(os.getcwd(), "resultatsv2")
-            self.queue.put(("log", f"\nðŸ“ Utilisation du dossier par dÃ©faut : {default_dir}"))
+            self.queue.put(("log", f"\nðŸ“ Utilisation du dossier par défaut : {default_dir}"))
             return default_dir
 
     async def run_scraping_async(self, query, filters, nb_pages):
@@ -929,7 +929,7 @@ class LinkedInScraperGUI(ctk.CTk):
         try:
             # Utiliser la queue directement pour Ã©viter les problÃ¨mes de thread
             self.queue.put(("log", f"ðŸš€ DÃ©marrage de la recherche pour : {query}"))
-            self.queue.put(("log", f"ðŸ“„ Nombre de pages Ã  analyser : {nb_pages}"))
+            self.queue.put(("log", f"ðŸ“„ Nombre de pages à analyser : {nb_pages}"))
             
             dork_query = f"site:linkedin.com/in {query}"
             
@@ -939,11 +939,11 @@ class LinkedInScraperGUI(ctk.CTk):
                 self.queue.put(("log", "\nðŸ” Application des filtres..."))
                 results = [profile for profile in all_results if filter_profile(profile, filters)]
                 if len(results) < len(all_results):
-                    self.queue.put(("log", f"â„¹ï¸ {len(all_results) - len(results)} profils ont Ã©tÃ© filtrÃ©s"))
+                    self.queue.put(("log", f"â„¹ï¸ {len(all_results) - len(results)} profils ont Ã©tÃ© filtrés"))
             else:
                 results = all_results
             
-            self.queue.put(("log", f"\nâœ… Recherche terminÃ©e ! {len(results)} profils trouvÃ©s."))
+            self.queue.put(("log", f"\nâœ… Recherche terminÃ©e ! {len(results)} profils trouvés."))
             
             total_profiles = len(results)
             for i, profile in enumerate(results, 1):
@@ -964,7 +964,7 @@ class LinkedInScraperGUI(ctk.CTk):
                         
                         for result in email_results:
                             self.queue.put(("log", f"   âž” {result['email']}"))
-                            self.queue.put(("log", f"      âœ“ Score de validitÃ© : {result['score']}%"))
+                            self.queue.put(("log", f"      âœ“ Score de validité : {result['score']}%"))
                             if result['score'] > 60:
                                 self.queue.put(("log", f"      âœ… Email probablement valide"))
                                 if 'smtp_valid' in result and result['smtp_valid']:
@@ -974,18 +974,18 @@ class LinkedInScraperGUI(ctk.CTk):
                             self.queue.put(("log", f"      â„¹ï¸ {result['details']}"))
                     else:
                         for email, prob in profile.emails[:3]:
-                            self.queue.put(("log", f"   âž” {email} ({prob:.0%} de probabilitÃ©)"))
+                            self.queue.put(("log", f"   âž” {email} ({prob:.0%} de probabilité)"))
                 
                 self.queue.put(("progress", (i + 1) / (total_profiles + 1)))
             
             filename = ""
             if results:
-                # CrÃ©er le dossier par dÃ©faut sans demander
+                # Créer le dossier par défaut sans demander
                 default_dir = os.path.join(os.getcwd(), "resultatsv2")
                 filename = save_results(results, query, default_dir)
-                self.queue.put(("log", f"\nâœ… RÃ©sultats sauvegardÃ©s dans : {filename}"))
+                self.queue.put(("log", f"\nâœ… Résultats sauvegardés dans : {filename}"))
                 
-                # Ajouter la recherche Ã  l'historique
+                # Ajouter la recherche à l'historique
                 history_item = SearchHistoryItem(
                     query=query,
                     timestamp=datetime.now().strftime("%d/%m/%Y %H:%M"),
@@ -995,7 +995,7 @@ class LinkedInScraperGUI(ctk.CTk):
                 )
                 self.search_history.add_search(history_item)
                 
-                # Mettre Ã  jour l'affichage de l'historique si visible
+                # Mettre à jour l'affichage de l'historique si visible
                 if self.history_visible:
                     self.update_history_display()
             
@@ -1010,7 +1010,7 @@ class LinkedInScraperGUI(ctk.CTk):
             self.queue.put(("log", message))
 
     def safe_progress(self, value):
-        """Met Ã  jour la progression de maniÃ¨re thread-safe"""
+        """Met à jour la progression de maniÃ¨re thread-safe"""
         if self.queue:
             self.queue.put(("progress", value))
 
@@ -1042,7 +1042,7 @@ class LinkedInScraperGUI(ctk.CTk):
             self.update_progress(0)
 
     def create_widgets(self):
-        # DÃ©finition des couleurs personnalisÃ©es
+        # DÃ©finition des couleurs personnalisées
         PRIMARY_COLOR = "#3498db"       # Bleu principal
         SECONDARY_COLOR = "#2ecc71"     # Vert pour les actions positives
         DANGER_COLOR = "#e74c3c"        # Rouge pour les actions d'arrÃªt
@@ -1050,24 +1050,24 @@ class LinkedInScraperGUI(ctk.CTk):
         CARD_COLOR = "#16213e"          # Couleur des cartes/panneaux
         TEXT_COLOR = "#fff"             # Texte blanc
         
-        # IcÃ´nes pour l'interface (caractÃ¨res Unicode)
+        # Icônes pour l'interface (caractères Unicode)
         ICONS = {
-            "search": "ðŸ”",
-            "filter": "âš™ï¸",
-            "company": "ðŸ¢",
-            "location": "ðŸ“",
-            "options": "âš¡",
-            "pages": "ðŸ“„",
-            "email": "ðŸ“§",
-            "start": "â–¶ï¸",
-            "stop": "â¹ï¸",
-            "help": "â“",
-            "theme": "ðŸŽ¨",
-            "results": "ðŸ“Š",
-            "web": "ðŸŒ",
-            "history": "ðŸ“œ",
-            "clear": "ðŸ—‘ï¸",
-            "apply": "âœ…"
+            "search": "",
+            "filter": "",
+            "company": "",
+            "location": "",
+            "options": "",
+            "pages": "",
+            "email": "",
+            "start": "",
+            "stop": "",
+            "help": "",
+            "theme": "",
+            "results": "",
+            "web": "",
+            "history": "",
+            "clear": "",
+            "apply": ""
         }
         
         # Configurer le thÃ¨me global
@@ -1078,7 +1078,7 @@ class LinkedInScraperGUI(ctk.CTk):
         main_container = ctk.CTkFrame(self, fg_color="transparent")
         main_container.pack(fill="both", expand=True, padx=20, pady=20)
         
-        # En-tÃªte Ã©lÃ©gant avec dÃ©gradÃ©
+        # En-tête Ã©lÃ©gant avec dÃ©gradÃ©
         header = ctk.CTkFrame(main_container, fg_color=CARD_COLOR, corner_radius=15)
         header.pack(fill="x", pady=(0, 20))
         
@@ -1110,13 +1110,13 @@ class LinkedInScraperGUI(ctk.CTk):
         )
         version.pack(pady=(5, 0))
         
-        # Conteneur Ã  deux colonnes
+        # Conteneur à deux colonnes
         content = ctk.CTkFrame(main_container, fg_color="transparent")
         content.pack(fill="both", expand=True)
         
         # Configuration des colonnes
         content.grid_columnconfigure(0, weight=1)  # Colonne des contrÃ´les
-        content.grid_columnconfigure(1, weight=2)  # Colonne des rÃ©sultats
+        content.grid_columnconfigure(1, weight=2)  # Colonne des résultats
         
         # === COLONNE GAUCHE: CONTRÃ”LES ===
         controls = ctk.CTkFrame(content, fg_color=CARD_COLOR, corner_radius=15)
@@ -1220,13 +1220,13 @@ class LinkedInScraperGUI(ctk.CTk):
         )
         self.location_combo.pack(fill="x", pady=(5, 0))
         
-        # Options avancÃ©es
+        # Options avancées
         options_section = ctk.CTkFrame(controls, fg_color="transparent")
         options_section.pack(fill="x", padx=20, pady=10)
         
         options_label = ctk.CTkLabel(
             options_section,
-            text=f"{ICONS['options']} Options avancÃ©es",
+            text=f"{ICONS['options']} Options avancées",
             font=("Segoe UI", 18, "bold"),
             text_color=TEXT_COLOR
         )
@@ -1238,7 +1238,7 @@ class LinkedInScraperGUI(ctk.CTk):
         
         pages_label = ctk.CTkLabel(
             pages_frame,
-            text=f"{ICONS['pages']} Nombre de pages Ã  analyser",
+            text=f"{ICONS['pages']} Nombre de pages à analyser",
             font=("Segoe UI", 16),
             text_color=TEXT_COLOR
         )
@@ -1266,14 +1266,14 @@ class LinkedInScraperGUI(ctk.CTk):
         self.pages_label = ctk.CTkLabel(slider_frame, text="5 pages", font=("Segoe UI", 16), width=80)
         self.pages_label.pack(side="left", padx=(10, 0))
         
-        # VÃ©rification email
+        # Vérification email
         email_frame = ctk.CTkFrame(options_section, fg_color="transparent")
         email_frame.pack(fill="x", pady=10)
         
         self.verify_emails_var = ctk.BooleanVar(value=True)
         verify_emails_check = ctk.CTkSwitch(
             email_frame,
-            text=f"{ICONS['email']} VÃ©rifier les emails (DNS + SMTP)",
+            text=f"{ICONS['email']} Vérifier les emails (DNS + SMTP)",
             font=("Segoe UI", 16),
             variable=self.verify_emails_var,
             progress_color=PRIMARY_COLOR,
@@ -1286,10 +1286,10 @@ class LinkedInScraperGUI(ctk.CTk):
         actions_frame = ctk.CTkFrame(controls, fg_color="transparent")
         actions_frame.pack(fill="x", padx=20, pady=(20, 10))
         
-        # Bouton DÃ©marrer
+        # Bouton Démarrer
         self.start_button = ctk.CTkButton(
             actions_frame,
-            text=f"{ICONS['start']} DÃ‰MARRER LA RECHERCHE",
+            text=f"{ICONS['start']} DÉMARRER LA RECHERCHE",
             command=self.start_scraping,
             font=("Segoe UI", 18, "bold"),
             text_color=TEXT_COLOR,
@@ -1301,7 +1301,7 @@ class LinkedInScraperGUI(ctk.CTk):
         self.start_button.pack(fill="x", pady=(0, 10))
         self.create_tooltip(self.start_button, TOOLTIPS["start"])
         
-        # Bouton ArrÃªter
+        # Bouton Arrêter
         self.stop_button = ctk.CTkButton(
             actions_frame,
             text=f"{ICONS['stop']} ARRÃŠTER",
@@ -1366,13 +1366,13 @@ class LinkedInScraperGUI(ctk.CTk):
         self.results_frame = ctk.CTkFrame(content, fg_color=CARD_COLOR, corner_radius=15)
         self.results_frame.grid(row=0, column=1, sticky="nsew")
         
-        # En-tÃªte des rÃ©sultats
+        # En-tête des résultats
         results_header = ctk.CTkFrame(self.results_frame, fg_color="transparent")
         results_header.pack(fill="x", padx=20, pady=(20, 10))
         
         results_title = ctk.CTkLabel(
             results_header,
-            text=f"{ICONS['results']} RÃ©sultats",
+            text=f"{ICONS['results']} Résultats",
             font=("Segoe UI", 24, "bold"),
             text_color=TEXT_COLOR
         )
@@ -1417,7 +1417,7 @@ class LinkedInScraperGUI(ctk.CTk):
         self.history_items_frame = ctk.CTkFrame(self.history_panel, fg_color="transparent")
         self.history_items_frame.pack(fill="both", expand=True, padx=15, pady=15)
         
-        # En-tÃªte de l'historique
+        # En-tête de l'historique
         history_header = ctk.CTkFrame(self.history_panel, fg_color="transparent")
         history_header.pack(fill="x", padx=20, pady=(15, 5))
         
@@ -1443,7 +1443,7 @@ class LinkedInScraperGUI(ctk.CTk):
         )
         clear_button.pack(side="right")
         
-        # Container scrollable pour les Ã©lÃ©ments d'historique
+        # Container scrollable pour les éléments d'historique
         self.history_scroll = ctk.CTkScrollableFrame(self.history_items_frame, fg_color="transparent")
         self.history_scroll.pack(fill="both", expand=True, pady=10)
         
@@ -1453,7 +1453,7 @@ class LinkedInScraperGUI(ctk.CTk):
         
         footer_text = ctk.CTkLabel(
             footer_frame,
-            text="Â© 2024 LinkedIn Profile Scraper Pro | Tous droits rÃ©servÃ©s",
+            text="2025 LinkedIn Profile Scraper Pro | Tous droits réservés",
             font=("Segoe UI", 14),
             text_color="#6c7a89"
         )
@@ -1501,14 +1501,14 @@ class LinkedInScraperGUI(ctk.CTk):
     def show_welcome_message(self):
         self.log(" Bienvenue sur LPS ! (LinkedIn Profile Scraper)")
         self.log(" Cet outil vous permet de :")
-        self.log("   â€¢ Rechercher des profils LinkedIn selon vos critÃ¨res")
-        self.log("   â€¢ Extraire les informations de contact")
-        self.log("   â€¢ VÃ©rifier la validitÃ© des emails professionnels")
+        self.log("   Rechercher des profils LinkedIn selon vos critéres")
+        self.log("   Extraire les informations de contact")
+        self.log("   Vérifier la validité des emails professionnels")
         self.log("\n Pour commencer :")
-        self.log("1. Entrez vos mots-clÃ©s de recherche")
+        self.log("1. Entrez vos mots-clés de recherche")
         self.log("2. Configurez les filtres si besoin")
-        self.log("3. Cliquez sur 'DÃ©marrer'")
-        self.log("\nâ” Besoin d'aide ? Cliquez sur le bouton 'Aide'")
+        self.log("3. Cliquez sur 'Démarrer'")
+        self.log("\n❓ Besoin d'aide ? Cliquez sur le bouton 'Aide'")
     
     def show_help(self):
         help_window = ctk.CTkToplevel(self)
@@ -1526,7 +1526,7 @@ class LinkedInScraperGUI(ctk.CTk):
         ctk.set_appearance_mode(new_mode)
     
     def update_progress(self, value):
-        """Met Ã  jour la progression directement (pour les appels depuis le thread principal)"""
+        """Met à jour la progression directement (pour les appels depuis le thread principal)"""
         self.progress_bar.set(value)
         self.progress_label.configure(text=f"Progression : {int(value*100)}%")
     
@@ -1557,7 +1557,7 @@ class LinkedInScraperGUI(ctk.CTk):
         
         def _animate_step(step, total_steps):
             if step <= total_steps:
-                # Calculer l'opacitÃ© actuelle (de 0.3 Ã  1.0)
+                # Calculer l'opacitÃ© actuelle (de 0.3 à 1.0)
                 opacity = 0.3 + 0.7 * (step / total_steps)
                 
                 # Appliquer l'opacitÃ©
@@ -1578,11 +1578,11 @@ class LinkedInScraperGUI(ctk.CTk):
                 # Planifier la prochaine Ã©tape
                 self.after(int(duration/total_steps), lambda: _animate_step(step+1, total_steps))
             else:
-                # Restaurer la couleur d'origine Ã  la fin
+                # Restaurer la couleur d'origine à la fin
                 if original_fg and hasattr(widget, "configure"):
                     widget.configure(fg_color=original_fg)
                     
-        # DÃ©marrer l'animation
+        # Démarrer l'animation
         _animate_step(1, steps)
     
     def animate_widget_disappearance(self, widget, callback=None, steps=5, duration=100):
@@ -1592,7 +1592,7 @@ class LinkedInScraperGUI(ctk.CTk):
         
         def _animate_step(step, total_steps):
             if step <= total_steps:
-                # Calculer l'opacitÃ© actuelle (de 1.0 Ã  0.3)
+                # Calculer l'opacitÃ© actuelle (de 1.0 à 0.3)
                 opacity = 1.0 - 0.7 * (step / total_steps)
                 
                 # Appliquer l'opacitÃ©
@@ -1613,14 +1613,14 @@ class LinkedInScraperGUI(ctk.CTk):
                 # Planifier la prochaine Ã©tape
                 self.after(int(duration/total_steps), lambda: _animate_step(step+1, total_steps))
             else:
-                # ExÃ©cuter le callback Ã  la fin
+                # ExÃ©cuter le callback à la fin
                 if callback:
                     callback()
                 # Restaurer la couleur d'origine
                 if original_fg and hasattr(widget, "configure"):
                     widget.configure(fg_color=original_fg)
                     
-        # DÃ©marrer l'animation
+        # Démarrer l'animation
         _animate_step(1, steps)
     
     def update_pages_label(self, value):
@@ -1648,7 +1648,7 @@ class LinkedInScraperGUI(ctk.CTk):
         elif len(h) == 6:
             return tuple(int(h[i:i+2], 16) for i in range(0, 6, 2))
         else:
-            return (0, 0, 0)  # Noir par dÃ©faut
+            return (0, 0, 0)  # Noir par défaut
 
     def animate_button_click(self, button):
         """Anime un clic de bouton avec effet de pression."""
@@ -1658,7 +1658,7 @@ class LinkedInScraperGUI(ctk.CTk):
         # Effet de pression
         button.configure(fg_color=hover_color)
         
-        # Retour Ã  la couleur normale aprÃ¨s un court dÃ©lai
+        # Retour à la couleur normale aprÃ¨s un court dÃ©lai
         self.after(100, lambda: button.configure(fg_color=original_color))
 
     def toggle_history_panel(self):
@@ -1672,7 +1672,7 @@ class LinkedInScraperGUI(ctk.CTk):
             self.update_history_display()
 
     def update_history_display(self):
-        """Met Ã  jour l'affichage de l'historique."""
+        """Met à jour l'affichage de l'historique."""
         # Effacer tous les widgets existants
         for widget in self.history_scroll.winfo_children():
             widget.destroy()
@@ -1684,16 +1684,16 @@ class LinkedInScraperGUI(ctk.CTk):
         HOVER_COLOR = "#1e2f4d"
         TEXT_COLOR = "#fff"
         
-        # IcÃ´nes
+        # Icônes
         ICONS = {
-            "search": "ðŸ”",
-            "time": "â±ï¸",
-            "results": "ðŸ“Š",
-            "file": "ðŸ“„",
-            "use": "â–¶ï¸"
+            "search": "",
+            "time": "",
+            "results": "",
+            "file": "",
+            "use": ""
         }
         
-        # RÃ©cupÃ©rer les Ã©lÃ©ments d'historique
+        # RÃ©cupÃ©rer les éléments d'historique
         history_items = self.search_history.get_items()
         
         if not history_items:
@@ -1707,7 +1707,7 @@ class LinkedInScraperGUI(ctk.CTk):
             empty_label.pack(pady=20)
             return
         
-        # CrÃ©er un widget pour chaque Ã©lÃ©ment d'historique
+        # Créer un widget pour chaque Ã©lÃ©ment d'historique
         for item in history_items:
             # Conteneur pour l'Ã©lÃ©ment
             item_frame = ctk.CTkFrame(self.history_scroll, fg_color=HOVER_COLOR, corner_radius=10)
@@ -1739,7 +1739,7 @@ class LinkedInScraperGUI(ctk.CTk):
             )
             date_label.pack(side="right")
             
-            # Ligne 2: Filtres et rÃ©sultats
+            
             line2 = ctk.CTkFrame(inner_frame, fg_color="transparent")
             line2.pack(fill="x", pady=(0, 5))
             
@@ -1759,10 +1759,10 @@ class LinkedInScraperGUI(ctk.CTk):
             )
             filters_label.pack(side="left")
             
-            # Nombre de rÃ©sultats
+            # Nombre de résultats
             results_label = ctk.CTkLabel(
                 line2,
-                text=f"{ICONS['results']} {item.results_count} rÃ©sultats",
+                text=f"{ICONS['results']} {item.results_count} résultats",
                 font=("Segoe UI", 14),
                 text_color=TEXT_COLOR
             )
@@ -1785,11 +1785,11 @@ class LinkedInScraperGUI(ctk.CTk):
             )
             use_button.pack(side="left")
             
-            # Bouton pour ouvrir le fichier de rÃ©sultats
+            # Bouton pour ouvrir le fichier de résultats
             if item.file_path and os.path.exists(item.file_path):
                 open_button = ctk.CTkButton(
                     line3,
-                    text=f"{ICONS['file']} Voir rÃ©sultats",
+                    text=f"{ICONS['file']} Voir résultats",
                     command=lambda path=item.file_path: os.startfile(path),
                     font=("Segoe UI", 14),
                     fg_color=SECONDARY_COLOR,
@@ -1800,8 +1800,8 @@ class LinkedInScraperGUI(ctk.CTk):
                 open_button.pack(side="right")
     
     def reuse_search(self, query, filters):
-        """Relance une recherche Ã  partir de l'historique."""
-        # Remplir le formulaire avec les paramÃ¨tres de la recherche
+        """Relance une recherche à partir de l'historique."""
+        # Remplir le formulaire avec les paramètres de la recherche
         self.search_var.set(query)
         
         if filters.entreprise:
